@@ -60,8 +60,9 @@ public class ClientHttpRequestCorrelationInterceptorTest {
     public void shouldSetHeader() throws IOException {
 
         // given
+        final String sessionId = UUID.randomUUID().toString();
         final String requestId = UUID.randomUUID().toString();
-        CorrelationTestUtils.setRequestId(requestId);
+        CorrelationTestUtils.setCorrelatingIds(sessionId, requestId);
 
         final HttpRequest request = mock(HttpRequest.class);
         final ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
@@ -73,8 +74,10 @@ public class ClientHttpRequestCorrelationInterceptorTest {
         instance.intercept(request, body, execution);
 
         // then
-        assertTrue(request.getHeaders().containsKey(RequestCorrelationConsts.HEADER_NAME));
-        assertEquals(requestId, request.getHeaders().getFirst(RequestCorrelationConsts.HEADER_NAME));
+        assertTrue(request.getHeaders().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertEquals(sessionId, request.getHeaders().getFirst(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertTrue(request.getHeaders().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
+        assertEquals(requestId, request.getHeaders().getFirst(RequestCorrelationConsts.REQUEST_HEADER_NAME));
         verify(execution).execute(request, body);
     }
 
@@ -92,7 +95,8 @@ public class ClientHttpRequestCorrelationInterceptorTest {
         instance.intercept(request, body, execution);
 
         // then
-        assertFalse(request.getHeaders().containsKey(RequestCorrelationConsts.HEADER_NAME));
+        assertFalse(request.getHeaders().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertFalse(request.getHeaders().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
         verify(execution).execute(request, body);
     }
 }

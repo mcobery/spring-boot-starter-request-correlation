@@ -17,6 +17,7 @@ package net.saliman.spring.request.correlation.generator;
 
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 /**
@@ -32,7 +33,18 @@ public class UuidGenerator implements CorrelationIdGenerator {
      * @return random uuid
      */
     @Override
-    public String generate() {
+    public String generateSessionId(HttpServletRequest request) {
+
+        return request.getSession().getId();
+    }
+
+    /**
+     * Generates new request id as random UUID.
+     *
+     * @return random uuid
+     */
+    @Override
+    public String generateRequestId(HttpServletRequest request) {
 
         return UUID.randomUUID().toString();
     }

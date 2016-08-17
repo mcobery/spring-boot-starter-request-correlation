@@ -25,7 +25,12 @@ public interface RequestCorrelationConsts {
     /**
      * The request correlation header name.
      */
-    String HEADER_NAME = "X-Request-Id";
+    String SESSION_HEADER_NAME = "X-Session-Id";
+
+    /**
+     * The request correlation header name.
+     */
+    String REQUEST_HEADER_NAME = "X-Request-Id";
 
     /**
      * The request attribute name.

@@ -55,24 +55,29 @@ public class RequestCorrelationUtilsTest {
         RequestContextHolder.resetRequestAttributes();
 
         // when
-        final String correlationId = RequestCorrelationUtils.getCurrentCorrelationId();
+        final String currentSessionId = RequestCorrelationUtils.getCurrentSessionId();
+        final String currentRequestId = RequestCorrelationUtils.getCurrentRequestId();
 
         // then
-        assertNull(correlationId);
+        assertNull(currentSessionId);
+        assertNull(currentRequestId);
     }
 
     @Test
-    public void shouldRetrieveRequestId() {
+    public void shouldRetrieveCorrelatingIds() {
 
         // given
+        final String sessionId = UUID.randomUUID().toString();
         final String requestId = UUID.randomUUID().toString();
         RequestContextHolder.getRequestAttributes().setAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME,
-                new DefaultRequestCorrelation(requestId), RequestAttributes.SCOPE_REQUEST);
+                new DefaultRequestCorrelation(sessionId, requestId), RequestAttributes.SCOPE_REQUEST);
 
         // when
-        final String correlationId = RequestCorrelationUtils.getCurrentCorrelationId();
+        final String currentSessionId = RequestCorrelationUtils.getCurrentSessionId();
+        final String currentRequestId = RequestCorrelationUtils.getCurrentRequestId();
 
         // then
-        assertEquals(requestId, correlationId);
+        assertEquals(sessionId, currentSessionId);
+        assertEquals(requestId, currentRequestId);
     }
 }

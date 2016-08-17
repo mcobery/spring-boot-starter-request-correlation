@@ -25,7 +25,11 @@ public class RequestCorrelationProperties {
     /**
      * Header name.
      */
-    private String headerName = RequestCorrelationConsts.HEADER_NAME;
+    private String sessionHeaderName = RequestCorrelationConsts.SESSION_HEADER_NAME;
+    /**
+     * Header name.
+     */
+    private String requestHeaderName = RequestCorrelationConsts.REQUEST_HEADER_NAME;
 
     /**
      * Creates new instance of {@link RequestCorrelationProperties} class.
@@ -38,8 +42,8 @@ public class RequestCorrelationProperties {
      *
      * @return the header names
      */
-    public String getHeaderName() {
-        return headerName;
+    public String getSessionHeaderName() {
+        return sessionHeaderName;
     }
 
     /**
@@ -47,7 +51,25 @@ public class RequestCorrelationProperties {
      *
      * @param headerName the header names
      */
-    public void setHeaderName(String headerName) {
-        this.headerName = headerName;
+    public void setSessionHeaderName(String headerName) {
+        this.sessionHeaderName = headerName;
+    }
+
+    /**
+     * Retrieves the header names.
+     *
+     * @return the header names
+     */
+    public String getRequestHeaderName() {
+        return requestHeaderName;
+    }
+
+    /**
+     * Sets the header names.
+     *
+     * @param headerName the header names
+     */
+    public void setRequestHeaderName(String headerName) {
+        this.requestHeaderName = headerName;
     }
 }

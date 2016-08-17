@@ -32,7 +32,27 @@ public class RequestCorrelationUtils {
      * @return the correlation id or {@code null}
      */
     @SuppressWarnings("unchecked")
-    public static String getCurrentCorrelationId() {
+    public static String getCurrentSessionId() {
+
+        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            Object correlationId = requestAttributes
+                    .getAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME, RequestAttributes.SCOPE_REQUEST);
+
+            if (correlationId instanceof RequestCorrelation) {
+                return ((RequestCorrelation) correlationId).getSessionId();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves the current request correlation id if present.
+     *
+     * @return the correlation id or {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public static String getCurrentRequestId() {
 
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {

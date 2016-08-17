@@ -27,5 +27,12 @@ public interface RequestCorrelation {
      *
      * @return the request correlation id
      */
+    String getSessionId();
+
+    /**
+     * Returns the request correlation id.
+     *
+     * @return the request correlation id
+     */
     String getRequestId();
 }

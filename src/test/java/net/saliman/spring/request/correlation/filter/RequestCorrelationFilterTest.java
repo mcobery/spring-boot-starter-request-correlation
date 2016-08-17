@@ -73,19 +73,22 @@ public class RequestCorrelationFilterTest {
 
         // then
         assertNotNull(request.getAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME));
-        assertNotNull(((HttpServletRequest)chain.getRequest()).getHeader(RequestCorrelationConsts.HEADER_NAME));
+        assertNotNull(((HttpServletRequest)chain.getRequest()).getHeader(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertNotNull(((HttpServletRequest)chain.getRequest()).getHeader(RequestCorrelationConsts.REQUEST_HEADER_NAME));
     }
 
     @Test
     public void shouldUseExistingCorrelationId() throws IOException, ServletException {
 
         // given
+        final String sessionId = UUID.randomUUID().toString();
         final String requestId = UUID.randomUUID().toString();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockFilterChain chain = new MockFilterChain();
 
-        request.addHeader(RequestCorrelationConsts.HEADER_NAME, requestId);
+        request.addHeader(RequestCorrelationConsts.SESSION_HEADER_NAME, sessionId);
+        request.addHeader(RequestCorrelationConsts.REQUEST_HEADER_NAME, requestId);
 
         // when
         instance.doFilter(request, response, chain);
@@ -95,7 +98,10 @@ public class RequestCorrelationFilterTest {
         assertNotNull(requestCorrelation);
         assertEquals(requestId, ((RequestCorrelation) requestCorrelation).getRequestId());
 
-        final String header = ((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.HEADER_NAME);
+        String header = ((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.SESSION_HEADER_NAME);
+        assertNotNull(header);
+        assertEquals(sessionId, header);
+        header = ((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.REQUEST_HEADER_NAME);
         assertNotNull(header);
         assertEquals(requestId, header);
     }
@@ -104,14 +110,18 @@ public class RequestCorrelationFilterTest {
     public void shouldUseCustomHeader() throws IOException, ServletException {
 
         // given
-        final String headerName = "X-TraceId";
+        final String sessionHeaderName = "X-SessionTraceId";
+        final String requestHeaderName = "X-RequestTraceId";
+        final String sessionId = UUID.randomUUID().toString();
         final String requestId = UUID.randomUUID().toString();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockFilterChain chain = new MockFilterChain();
 
-        request.addHeader(headerName, requestId);
-        properties.setHeaderName(headerName);
+        request.addHeader(sessionHeaderName, sessionId);
+        request.addHeader(requestHeaderName, requestId);
+        properties.setSessionHeaderName(sessionHeaderName);
+        properties.setRequestHeaderName(requestHeaderName);
 
         // when
         instance.doFilter(request, response, chain);
@@ -121,7 +131,10 @@ public class RequestCorrelationFilterTest {
         assertNotNull(requestCorrelation);
         assertEquals(requestId, ((RequestCorrelation) requestCorrelation).getRequestId());
 
-        final String header = ((HttpServletRequest) chain.getRequest()).getHeader(headerName);
+        String header = ((HttpServletRequest) chain.getRequest()).getHeader(sessionHeaderName);
+        assertNotNull(header);
+        assertEquals(sessionId, header);
+        header = ((HttpServletRequest) chain.getRequest()).getHeader(requestHeaderName);
         assertNotNull(header);
         assertEquals(requestId, header);
     }
@@ -141,13 +154,16 @@ public class RequestCorrelationFilterTest {
         instance.doFilter(request, response, chain);
 
         // then
-        final String requestId = ((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.HEADER_NAME);
-        final RequestCorrelation correlationId = (RequestCorrelation) request.getAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME);
+        final String sessionId = ((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.SESSION_HEADER_NAME);
+        final String requestId = ((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.REQUEST_HEADER_NAME);
+        final RequestCorrelation correlationIds = (RequestCorrelation) request.getAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME);
+        assertNotNull(sessionId);
         assertNotNull(requestId);
-        assertNotNull(correlationId);
-        assertEquals(requestId, correlationId.getRequestId());
+        assertNotNull(correlationIds);
+        assertEquals(sessionId, correlationIds.getSessionId());
+        assertEquals(requestId, correlationIds.getRequestId());
 
-        verify(interceptor).afterCorrelationIdSet(requestId);
-        verify(interceptor).cleanUp(requestId);
+        verify(interceptor).afterCorrelationIdSet(sessionId, requestId);
+        verify(interceptor).cleanUp(sessionId, requestId);
     }
 }

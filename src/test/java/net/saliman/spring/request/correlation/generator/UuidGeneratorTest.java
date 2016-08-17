@@ -16,6 +16,7 @@
 package net.saliman.spring.request.correlation.generator;
 
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -26,11 +27,13 @@ import static org.junit.Assert.assertNotNull;
  */
 public class UuidGeneratorTest {
 
+    // TODO: 8/17/2016 Create a test to get sessionID
     @Test
     public void shouldGenerateId() {
+        final MockHttpServletRequest request = new MockHttpServletRequest();
 
         // when
-        final String requestId = new UuidGenerator().generate();
+        final String requestId = new UuidGenerator().generateRequestId(request);
 
         // then
         assertNotNull(requestId);

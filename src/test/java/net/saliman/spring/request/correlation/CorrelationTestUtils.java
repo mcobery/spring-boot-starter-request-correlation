@@ -32,8 +32,8 @@ public class CorrelationTestUtils {
      *
      * @param requestId the request id
      */
-    public static void setRequestId(String requestId) {
+    public static void setCorrelatingIds(String sessionId, String requestId) {
         RequestContextHolder.getRequestAttributes().setAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME,
-                new DefaultRequestCorrelation(requestId), RequestAttributes.SCOPE_REQUEST);
+                new DefaultRequestCorrelation(sessionId, requestId), RequestAttributes.SCOPE_REQUEST);
     }
 }

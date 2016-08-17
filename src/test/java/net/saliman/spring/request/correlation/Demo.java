@@ -118,26 +118,34 @@ public class Demo {
         }
 
         @RequestMapping(value = "/", method = RequestMethod.GET)
-        public ResponseEntity<String> headerEcho(@RequestHeader(value = "X-Request-Id") String requestId) {
+        public ResponseEntity<String> headerEcho(
+                @RequestHeader(value = "X-Session-Id") String sessionId,
+                @RequestHeader(value = "X-Request-Id") String requestId) {
 
-            return ResponseEntity.ok(requestId);
+            return ResponseEntity.ok(sessionId + ":" + requestId);
         }
 
         @RequestMapping(value = "/rest", method = RequestMethod.GET)
-        public ResponseEntity propagateRestTemplate(@RequestHeader(value = "X-Request-Id") String requestId) {
+        public ResponseEntity propagateRestTemplate(
+                @RequestHeader(value = "X-Session-Id") String sessionId,
+                @RequestHeader(value = "X-Request-Id") String requestId) {
 
+            final String expectedResponse = sessionId + ":" + requestId;
             final String response = restTemplate().getForObject(url("/"), String.class);
-            if(!requestId.equals(response)) {
+            if(!expectedResponse.equals(response)) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
             return ResponseEntity.ok(response);
         }
 
         @RequestMapping(value = "/feign", method = RequestMethod.GET)
-        public ResponseEntity propagateFeignClient(@RequestHeader(value = "X-Request-Id") String requestId) {
+        public ResponseEntity propagateFeignClient(
+                @RequestHeader(value = "X-Session-Id") String sessionId,
+                @RequestHeader(value = "X-Request-Id") String requestId) {
 
+            final String expectedResponse = sessionId + ":" + requestId;
             final String response = feignClient.getRequestId();
-            if(!requestId.equals(response)) {
+            if(!expectedResponse.equals(response)) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
             return ResponseEntity.ok(response);

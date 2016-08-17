@@ -27,15 +27,18 @@ public final class DefaultRequestCorrelation implements RequestCorrelation {
     /**
      * The actual request correlation id.
      */
-    private final String id;
+    private final String sessionId;
+
+    private final String requestId;
 
     /**
      * Creates new instance of {@link DefaultRequestCorrelation} class.
      *
      * @param id the request id
      */
-    public DefaultRequestCorrelation(String id) {
-        this.id = id;
+    public DefaultRequestCorrelation(String sessionId, String requestId) {
+        this.sessionId = sessionId;
+        this.requestId = requestId;
     }
 
     /**
@@ -44,7 +47,16 @@ public final class DefaultRequestCorrelation implements RequestCorrelation {
      * @return the request identifier
      */
     @Override
+    public String getSessionId() {
+        return sessionId;
+    }
+    /**
+     * Retrieves the request identifier.
+     *
+     * @return the request identifier
+     */
+    @Override
     public String getRequestId() {
-        return id;
+        return requestId;
     }
 }

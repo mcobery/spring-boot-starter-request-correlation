@@ -58,17 +58,21 @@ public class FeignCorrelationInterceptorTest {
     public void shouldSetHeader() {
 
         // given
-        final String requestId = UUID.randomUUID().toString();
-        CorrelationTestUtils.setRequestId(requestId);
+        final String sessionId = "TEST_SESSION_ID";
+        final String requestId = "TEST_REQUEST_ID";
+        CorrelationTestUtils.setCorrelatingIds(sessionId, requestId);
         final RequestTemplate request = new RequestTemplate();
 
         // when
         instance.apply(request);
 
         // then
-        assertTrue(request.headers().containsKey(RequestCorrelationConsts.HEADER_NAME));
-        assertEquals(1, request.headers().get(RequestCorrelationConsts.HEADER_NAME).size());
-        assertEquals(requestId, request.headers().get(RequestCorrelationConsts.HEADER_NAME).iterator().next());
+        assertTrue(request.headers().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertEquals(1, request.headers().get(RequestCorrelationConsts.SESSION_HEADER_NAME).size());
+        assertEquals(sessionId, request.headers().get(RequestCorrelationConsts.SESSION_HEADER_NAME).iterator().next());
+        assertTrue(request.headers().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
+        assertEquals(1, request.headers().get(RequestCorrelationConsts.REQUEST_HEADER_NAME).size());
+        assertEquals(requestId, request.headers().get(RequestCorrelationConsts.REQUEST_HEADER_NAME).iterator().next());
     }
 
     @Test
@@ -81,7 +85,8 @@ public class FeignCorrelationInterceptorTest {
         instance.apply(request);
 
         // then
-        assertFalse(request.headers().containsKey(RequestCorrelationConsts.HEADER_NAME));
+        assertFalse(request.headers().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertFalse(request.headers().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
     }
 
 }

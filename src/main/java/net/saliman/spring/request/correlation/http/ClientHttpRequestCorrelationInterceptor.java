@@ -58,9 +58,15 @@ public class ClientHttpRequestCorrelationInterceptor implements ClientHttpReques
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
         // sets the correlation id
-        final String correlationId = RequestCorrelationUtils.getCurrentCorrelationId();
-        if(correlationId != null) {
-            request.getHeaders().add(RequestCorrelationConsts.HEADER_NAME, correlationId);
+        final String sessionId = RequestCorrelationUtils.getCurrentSessionId();
+        if(sessionId != null) {
+            request.getHeaders().add(RequestCorrelationConsts.SESSION_HEADER_NAME, sessionId);
+        }
+
+        // sets the correlation id
+        final String requestId = RequestCorrelationUtils.getCurrentRequestId();
+        if(requestId != null) {
+            request.getHeaders().add(RequestCorrelationConsts.REQUEST_HEADER_NAME, requestId);
         }
 
         // proceeds with execution

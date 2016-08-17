@@ -34,8 +34,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The entry point for the request correlation. This filter intercepts any incoming request and in case that it
- * does not contain the correlation header creates new identifier and stores it both as the request header
+ * The entry point for the request correlation. This filter intercepts any
+ * incoming request and in case that it
+ * does not contain the correlation header creates new identifier and stores it
+ * both as the request header
  * and also as a attribute.
  *
  * @author Jakub Narloch
@@ -43,234 +45,264 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RequestCorrelationFilter implements Filter {
 
-    /**
-     * Logger instance used by this class.
-     */
-    private final Logger logger = LoggerFactory.getLogger(RequestCorrelationFilter.class);
+	/**
+	 * Logger instance used by this class.
+	 */
+	private final Logger logger = LoggerFactory.getLogger(RequestCorrelationFilter.class);
 
-    /**
-     * The request generator used for generating new identifiers.
-     */
-    private final CorrelationIdGenerator correlationIdGenerator;
+	/**
+	 * The request generator used for generating new identifiers.
+	 */
+	private final CorrelationIdGenerator correlationIdGenerator;
 
-    /**
-     * List of optional interceptors.
-     */
-    private final List<RequestCorrelationInterceptor> interceptors;
+	/**
+	 * List of optional interceptors.
+	 */
+	private final List<RequestCorrelationInterceptor> interceptors;
 
-    /**
-     * The request correlation properties.
-     */
-    private final RequestCorrelationProperties properties;
+	/**
+	 * The request correlation properties.
+	 */
+	private final RequestCorrelationProperties properties;
 
-    /**
-     * Creates new instance of {@link CorrelationIdGenerator} class.
-     *
-     * @param correlationIdGenerator the request id generator
-     * @param interceptors           the correlation interceptors
-     * @param properties the request properties
-     * @throws IllegalArgumentException if {@code requestIdGenerator} is {@code null}
-     *                                  or {@code interceptors} is {@code null}
-     *                                  or {@code properties} is {@code null}
-     */
-    public RequestCorrelationFilter(CorrelationIdGenerator correlationIdGenerator,
-                                    List<RequestCorrelationInterceptor> interceptors, RequestCorrelationProperties properties) {
-        Assert.notNull(correlationIdGenerator, "Parameter 'correlationIdGenerator' can not be null.");
-        Assert.notNull(interceptors, "Parameter 'interceptors' can not be null.");
-        Assert.notNull(properties, "Parameter 'properties' can not be null.");
+	/**
+	 * Creates new instance of {@link CorrelationIdGenerator} class.
+	 *
+	 * @param correlationIdGenerator the request id generator
+	 * @param interceptors the correlation interceptors
+	 * @param properties the request properties
+	 * @throws IllegalArgumentException if {@code requestIdGenerator} is {@code
+	 * null}
+	 * or {@code interceptors} is {@code null}
+	 * or {@code properties} is {@code null}
+	 */
+	public RequestCorrelationFilter(CorrelationIdGenerator correlationIdGenerator,
+	                                List<RequestCorrelationInterceptor> interceptors, RequestCorrelationProperties properties) {
+		Assert.notNull(correlationIdGenerator, "Parameter 'correlationIdGenerator' can not be null.");
+		Assert.notNull(interceptors, "Parameter 'interceptors' can not be null.");
+		Assert.notNull(properties, "Parameter 'properties' can not be null.");
 
-        this.correlationIdGenerator = correlationIdGenerator;
-        this.interceptors = interceptors;
-        this.properties = properties;
-    }
+		this.correlationIdGenerator = correlationIdGenerator;
+		this.interceptors = interceptors;
+		this.properties = properties;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // empty method
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		// empty method
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        // empty method
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void destroy() {
+		// empty method
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-            doHttpFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
-        } else {
-            // otherwise just pass through
-            chain.doFilter(request, response);
-        }
-    }
+		if ( request instanceof HttpServletRequest && response instanceof HttpServletResponse ) {
+			doHttpFilter((HttpServletRequest)request, (HttpServletResponse)response, chain);
+		} else {
+			// otherwise just pass through
+			chain.doFilter(request, response);
+		}
+	}
 
-    /**
-     * Performs 'enrichment' of incoming HTTP request.
-     *
-     * @param request  the http servlet request
-     * @param response the http servlet response
-     * @param chain    the filter processing chain
-     * @throws IOException      if any error occurs
-     * @throws ServletException if any error occurs
-     */
-    private void doHttpFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+	/**
+	 * Performs 'enrichment' of incoming HTTP request.
+	 *
+	 * @param request the http servlet request
+	 * @param response the http servlet response
+	 * @param chain the filter processing chain
+	 * @throws IOException if any error occurs
+	 * @throws ServletException if any error occurs
+	 */
+	private void doHttpFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        // retrieves the correlationId
-        String correlationId = getCorrelationId(request);
+		// retrieves the correlationId
+		String sessionId = getSessionId(request);
 
-        // verifies the correlation id was set
-        if (StringUtils.isBlank(correlationId)) {
-            correlationId = generateCorrelationId();
-            logger.debug("Request correlation id was not present, generating new one: {}", correlationId);
-        }
+		// verifies the correlation id was set
+		if ( StringUtils.isBlank(sessionId) ) {
+			sessionId = generateSessionId(request);
+			logger.debug("Session correlation id was not present, generating new one: {}", sessionId);
+		}
 
-        // triggers interceptors
-        triggerInterceptors(correlationId);
+		String requestId = getRequestId(request);
+		// verifies the correlation id was set
+		if ( StringUtils.isBlank(requestId) ) {
+			requestId = generateRequestId(request);
+			logger.debug("Request correlation id was not present, generating new one: {}", requestId);
+		}
 
-        // instantiates new request correlation
-        final RequestCorrelation requestCorrelation = new DefaultRequestCorrelation(correlationId);
+		// triggers interceptors
+		triggerInterceptors(sessionId, requestId);
 
-        // populates the attribute
-        final ServletRequest req = enrichRequest(request, requestCorrelation);
+		// instantiates new request correlation
+		final RequestCorrelation requestCorrelation = new DefaultRequestCorrelation(sessionId, requestId);
 
-        try {
-            // proceeds with execution
-            chain.doFilter(req, response);
-        } finally {
-            triggerInterceptorsCleanup(correlationId);
-        }
-    }
+		// populates the attribute
+		final ServletRequest req = enrichRequest(request, requestCorrelation);
 
-    /**
-     * Retrieves the correlation id from the request, if present.
-     *
-     * @param request the http servlet request
-     * @return the correlation id
-     */
-    private String getCorrelationId(HttpServletRequest request) {
+		try {
+			// proceeds with execution
+			chain.doFilter(req, response);
+		} finally {
+			triggerInterceptorsCleanup(sessionId, requestId);
+		}
+	}
 
-        return request.getHeader(properties.getHeaderName());
-    }
+	/**
+	 * Retrieves the correlation id from the request, if present.
+	 *
+	 * @param request the http servlet request
+	 * @return the correlation id
+	 */
+	private String getSessionId(HttpServletRequest request) {
 
-    /**
-     * Generates new correlation id.
-     *
-     * @return the correlation id
-     */
-    private String generateCorrelationId() {
+		return request.getHeader(properties.getSessionHeaderName());
+	}
 
-        return correlationIdGenerator.generate();
-    }
+	/**
+	 * Retrieves the correlation id from the request, if present.
+	 *
+	 * @param request the http servlet request
+	 * @return the correlation id
+	 */
+	private String getRequestId(HttpServletRequest request) {
 
-    /**
-     * Triggers the configured interceptors.
-     *
-     * @param correlationId the correlation id
-     */
-    private void triggerInterceptors(String correlationId) {
+		return request.getHeader(properties.getRequestHeaderName());
+	}
 
-        for (RequestCorrelationInterceptor interceptor : interceptors) {
-            interceptor.afterCorrelationIdSet(correlationId);
-        }
-    }
+	/**
+	 * Generates new correlation id.
+	 *
+	 * @return the correlation id
+	 */
+	private String generateSessionId(HttpServletRequest request) {
 
-    /**
-     * Triggers the configured interceptors cleanUp methods.
-     *
-     * @param correlationId the correlation id
-     */
-    private void triggerInterceptorsCleanup(String correlationId) {
+		return correlationIdGenerator.generateSessionId(request);
+	}
 
-        for (RequestCorrelationInterceptor interceptor : interceptors) {
-            interceptor.cleanUp(correlationId);
-        }
-    }
+	/**
+	 * Generates new correlation id.
+	 *
+	 * @return the correlation id
+	 */
+	private String generateRequestId(HttpServletRequest request) {
 
-    /**
-     * "Enriches" the request.
-     *
-     * @param request       the http servlet request
-     * @param correlationId the correlation id
-     * @return the servlet request
-     */
-    private ServletRequest enrichRequest(HttpServletRequest request, RequestCorrelation correlationId) {
+		return correlationIdGenerator.generateRequestId(request);
+	}
 
-        final CorrelatedServletRequest req = new CorrelatedServletRequest(request);
-        req.setAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME, correlationId);
-        req.setHeader(properties.getHeaderName(), correlationId.getRequestId());
-        return req;
-    }
+	/**
+	 * Triggers the configured interceptors.
+	 *
+	 * @param sessionId the correlation id
+	 */
+	private void triggerInterceptors(String sessionId, String requestId) {
 
-    /**
-     * An http servlet wrapper that allows to register additional HTTP headers.
-     *
-     * @author Jakub Narloch
-     */
-    private static class CorrelatedServletRequest extends HttpServletRequestWrapper {
+		for ( RequestCorrelationInterceptor interceptor : interceptors ) {
+			interceptor.afterCorrelationIdSet(sessionId, requestId);
+		}
+	}
 
-        /**
-         * Map with additional customizable headers.
-         */
-        private final Map<String, String> additionalHeaders = new ConcurrentHashMap<>();
+	/**
+	 * Triggers the configured interceptors cleanUp methods.
+	 *
+	 * @param sessionId the correlation id
+	 */
+	private void triggerInterceptorsCleanup(String sessionId, String requestId) {
 
-        /**
-         * Creates a ServletRequest adaptor wrapping the given request object.
-         *
-         * @param request The request to wrap
-         * @throws IllegalArgumentException if the request is null
-         */
-        public CorrelatedServletRequest(HttpServletRequest request) {
-            super(request);
-        }
+		for ( RequestCorrelationInterceptor interceptor : interceptors ) {
+			interceptor.cleanUp(sessionId, requestId);
+		}
+	}
 
-        /**
-         * Sets the header value.
-         *
-         * @param key   the header name
-         * @param value the header value
-         */
-        public void setHeader(String key, String value) {
+	/**
+	 * "Enriches" the request.
+	 *
+	 * @param request the http servlet request
+	 * @param correlationId the correlation id
+	 * @return the servlet request
+	 */
+	private ServletRequest enrichRequest(HttpServletRequest request, RequestCorrelation correlationId) {
 
-            this.additionalHeaders.put(key, value);
-        }
+		final CorrelatedServletRequest req = new CorrelatedServletRequest(request);
+		req.setAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME, correlationId);
+		req.setHeader(properties.getSessionHeaderName(), correlationId.getSessionId());
+		req.setHeader(properties.getRequestHeaderName(), correlationId.getRequestId());
+		return req;
+	}
 
-        @Override
-        public String getHeader(String name) {
-            if (additionalHeaders.containsKey(name)) {
-                return additionalHeaders.get(name);
-            }
-            return super.getHeader(name);
-        }
+	/**
+	 * An http servlet wrapper that allows to register additional HTTP headers.
+	 *
+	 * @author Jakub Narloch
+	 */
+	private static class CorrelatedServletRequest extends HttpServletRequestWrapper {
 
-        @Override
-        public Enumeration<String> getHeaders(String name) {
+		/**
+		 * Map with additional customizable headers.
+		 */
+		private final Map<String, String> additionalHeaders = new ConcurrentHashMap<>();
 
-            final List<String> values = new ArrayList<>();
-            if (additionalHeaders.containsKey(name)) {
-                values.add(additionalHeaders.get(name));
-            } else {
-                values.addAll(Collections.list(super.getHeaders(name)));
-            }
-            return Collections.enumeration(values);
-        }
+		/**
+		 * Creates a ServletRequest adaptor wrapping the given request object.
+		 *
+		 * @param request The request to wrap
+		 * @throws IllegalArgumentException if the request is null
+		 */
+		public CorrelatedServletRequest(HttpServletRequest request) {
+			super(request);
+		}
 
-        @Override
-        public Enumeration<String> getHeaderNames() {
+		/**
+		 * Sets the header value.
+		 *
+		 * @param key the header name
+		 * @param value the header value
+		 */
+		public void setHeader(String key, String value) {
 
-            final Set<String> names = new HashSet<>();
-            names.addAll(additionalHeaders.keySet());
-            names.addAll(Collections.list(super.getHeaderNames()));
-            return Collections.enumeration(names);
-        }
-    }
+			this.additionalHeaders.put(key, value);
+		}
+
+		@Override
+		public String getHeader(String name) {
+			if ( additionalHeaders.containsKey(name) ) {
+				return additionalHeaders.get(name);
+			}
+			return super.getHeader(name);
+		}
+
+		@Override
+		public Enumeration<String> getHeaders(String name) {
+
+			final List<String> values = new ArrayList<>();
+			if ( additionalHeaders.containsKey(name) ) {
+				values.add(additionalHeaders.get(name));
+			} else {
+				values.addAll(Collections.list(super.getHeaders(name)));
+			}
+			return Collections.enumeration(values);
+		}
+
+		@Override
+		public Enumeration<String> getHeaderNames() {
+
+			final Set<String> names = new HashSet<>();
+			names.addAll(additionalHeaders.keySet());
+			names.addAll(Collections.list(super.getHeaderNames()));
+			return Collections.enumeration(names);
+		}
+	}
 }
