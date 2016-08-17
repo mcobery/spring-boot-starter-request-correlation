@@ -25,20 +25,17 @@ apply plugin: 'com.github.kt3k.coveralls'
 
 sourceCompatibility = 1.7
 
-group = "io.jmnarloch"
-archivesBaseName="request-correlation-spring-cloud-starter"
+group = "net.saliman"
+archivesBaseName="spring-boot-starter-request-correlation"
+version = '1.0.0'
 
 ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
-}
-
 jar {
     manifest {
-        attributes 'Implementation-Title': 'request-correlation-spring-cloud-starter',
+        attributes 'Implementation-Title': 'spring-boot-starter-request-correlation',
                    'Implementation-Version': version
     }
 }

@@ -7,17 +7,31 @@
 
 ## Features
 
-Allows to uniquely identify and track your request by passing `X-Request-Id` header across remote calls.  
+This project is derrived from Jakub Narloch's jmnarloch/request-correlation-spring-cloud-starter project.  It adds the notion of a correlating session id in 
+addition to the correlating request id.
+
+This starter allows to uniquely identify and track your request by passing 
+`X-Request-Id` and `X-Session-Id` headers across remote calls. 
+
+The Request Id is meant to track a single request across multiple collaborating
+service calls.
+
+The Session Id is meant to track multiple requests made by a user across an
+application.
+
+For example, if a user logs into an applicaiton, requests an object from the 
+server, then saves the modified version of the object, the "find" request and
+the "save" request will have different request ids, but the same session id. 
 
 ## Setup
 
-Add the Spring Cloud starter to your project:
+Add the Spring Boot starter to your project:
 
 ```xml
 <dependency>
-  <groupId>io.jmnarloch</groupId>
-  <artifactId>request-correlation-spring-cloud-starter</artifactId>
-  <version>1.2.0</version>
+  <groupId>net.saliman</groupId>
+  <artifactId>spring-boot-starter-request-correlation</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -38,7 +52,8 @@ public class Application {
 You can configure fallowing options:
 
 ```
-request.correlation.header-name=X-Request-Id # sets the header name to be used for request identification (X-Request-Id by default)
+request.correlation.session.header-name=X-Session-Id # sets the header name to be used for session identification (X-Session-Id by default)
+request.correlation.request.header-name=X-Request-Id # sets the header name to be used for request identification (X-Request-Id by default)
 request.correlation.client.http.enabled=true  # enables the RestTemplate header propagation (true by default)
 request.correlation.client.feign.enabled=true # enables the Fegin header propagation (true by default)
 ```

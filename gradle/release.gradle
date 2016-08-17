@@ -35,15 +35,15 @@ uploadArchives {
             }
 
             pom.project {
-                name 'request-correlation-spring-cloud-starter'
+                name 'spring-boot-starter-request-correlation'
                 packaging 'jar'
                 description 'Spring Cloud Request Correlation'
-                url 'https://github.com/jmnarloch/request-correlation-spring-cloud-starter'
+                url 'https://github.com/stevesaliman/sprint-boot-starter-request-correlation'
 
                 scm {
-                    connection 'scm:git:https://github.com/jmnarloch/request-correlation-spring-cloud-starter.git'
-                    developerConnection 'scm:git:https://github.com/jmnarloch/request-correlation-spring-cloud-starter.git'
-                    url 'https://github.com/jmnarloch/request-correlation-spring-cloud-starter.git'
+                    connection 'scm:git:https://github.com/stevesaliman/spring-boot-starter-request-correlation.git'
+                    developerConnection 'scm:git:https://github.com/stevesaliman/spring-boot-starter-request-correlation.git'
+                    url 'https://github.com/ssaliman/spring-boot-starter-request-correlation.git'
                 }
 
                 licenses {
@@ -54,6 +54,11 @@ uploadArchives {
                 }
 
                 developers {
+										developer {
+										    id 'stevesaliman'
+												name 'Steven C. Saliman'
+												email 'support@saliman.net'
+										}
                     developer {
                         id 'jmnarloch'
                         name 'Jakub Narloch'
