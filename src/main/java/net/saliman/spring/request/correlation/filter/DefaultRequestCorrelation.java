@@ -34,7 +34,8 @@ public final class DefaultRequestCorrelation implements RequestCorrelation {
     /**
      * Creates new instance of {@link DefaultRequestCorrelation} class.
      *
-     * @param id the request id
+     * @param sessionId the session id
+     * @param requestId the request id
      */
     public DefaultRequestCorrelation(String sessionId, String requestId) {
         this.sessionId = sessionId;

@@ -29,6 +29,7 @@ public interface CorrelationIdGenerator {
     /**
      * Generates the request id.
      *
+     * @param request the request object
      * @return generated the request id
      */
     String generateRequestId(HttpServletRequest request);
