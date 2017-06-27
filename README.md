@@ -2,12 +2,13 @@
 
 > A Spring Cloud starter for easy setup request correlation
 
-[![Build Status](https://travis-ci.org/jmnarloch/request-correlation-spring-cloud-starter.svg?branch=master)](https://travis-ci.org/jmnarloch/request-correlation-spring-cloud-starter)
-[![Coverage Status](https://coveralls.io/repos/jmnarloch/request-correlation-spring-cloud-starter/badge.svg?branch=master&service=github)](https://coveralls.io/github/jmnarloch/request-correlation-spring-cloud-starter?branch=master)
+## News
+**June 27, 2017** Version 1.1.0 of this starter now works with Spring Boot 1.4 
+and 1.5. to use this starter with spring boot 1.3, you will need version 1.0.0.
 
 ## Features
 
-This project is derrived from Jakub Narloch's jmnarloch/request-correlation-spring-cloud-starter project.  It adds the notion of a correlating session id in 
+This project is derived from Jakub Narloch's jmnarloch/request-correlation-spring-cloud-starter project.  It adds the notion of a correlating session id in 
 addition to the correlating request id.
 
 This starter allows to uniquely identify and track your request by passing 
@@ -19,7 +20,7 @@ service calls.
 The Session Id is meant to track multiple requests made by a user across an
 application.
 
-For example, if a user logs into an applicaiton, requests an object from the 
+For example, if a user logs into an application, requests an object from the 
 server, then saves the modified version of the object, the "find" request and
 the "save" request will have different request ids, but the same session id. 
 

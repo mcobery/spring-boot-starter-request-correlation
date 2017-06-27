@@ -25,9 +25,12 @@ apply plugin: 'com.github.kt3k.coveralls'
 
 sourceCompatibility = 1.7
 
+def mavenRepoUploadUrl = "scp://maxdevcloud/var/www/maven/repo"
+def mavenRepoUploadUser = "git"
+def privateKeyFile='c:/home/ssaliman/.ssh/id_rsa'
 group = "net.saliman"
 archivesBaseName="spring-boot-starter-request-correlation"
-version = '1.0.0'
+version = '1.1.0'
 
 ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
@@ -44,6 +47,10 @@ repositories {
     jcenter()
 }
 
+configurations {
+  archives
+}
+
 compileJava {
     options.fork = true
 }
@@ -52,11 +59,19 @@ dependencies {
 
     compile (libraries.springBootWeb)
     compile (libraries.springCloudFeign)
+    // For whatever reason, the Feign starter still brings in an old version
+    // of the http client.  We'll want to remove this from time to time to 
+		// see if Feign starts bringing in the right version on its own.
+    compile (libraries.apacheHttpClient)
     compile (libraries.commonsLang)
 
     testCompile (libraries.springBootTest)
     testCompile (libraries.junit)
     testCompile (libraries.mockito)
+
+		// Dependencies needed to upload to a maven reposotory.
+	  archives "org.apache.maven.wagon:wagon-ssh:2.2"
+		archives "org.apache.maven.wagon:wagon-ssh-external:2.2"
 }
 
 findbugs {
@@ -69,3 +84,21 @@ jacocoTestReport {
         html.enabled = true
     }
 }
+
+// Upload to the remote Maven repository. We change up the pom dependencies 
+// to make sure it is right on the server.
+uploadArchives {
+  doFirst {
+    repositories {
+      mavenDeployer {
+        configuration = project.configurations.archives
+        repository(url: mavenRepoUploadUrl) {
+          authentication(userName: mavenRepoUploadUser,
+                         privateKey: file("${privateKeyFile}"),
+                   passphrase: "${privateKeyPassphrase}")
+        }
+			}
+		}
+	}
+}
+

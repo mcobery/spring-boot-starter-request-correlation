@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2015 the original author or authors
+/*
+ * Copyright (c) 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 package net.saliman.spring.request.correlation.support;
 
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
+import net.saliman.spring.request.correlation.api.EnableRequestCorrelation;
 import net.saliman.spring.request.correlation.api.RequestCorrelationInterceptor;
 import net.saliman.spring.request.correlation.filter.RequestCorrelationFilter;
 import net.saliman.spring.request.correlation.generator.UuidGenerator;
-import net.saliman.spring.request.correlation.api.EnableRequestCorrelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
