@@ -27,6 +27,9 @@ apply plugin: 'com.github.kt3k.coveralls'
 
 sourceCompatibility = 1.7
 
+def mavenRepoUploadUrl = "scp://maxdevcloud/var/www/maven/repo"
+def mavenRepoUploadUser = "git"
+def privateKeyFile='/home/ssaliman/.ssh/id_rsa'
 // Release version that won't conflict with the bintray plugin
 group = "net.saliman"
 archivesBaseName = "spring-boot-starter-request-correlation"
