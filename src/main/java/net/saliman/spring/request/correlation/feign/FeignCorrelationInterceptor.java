@@ -17,7 +17,6 @@ package net.saliman.spring.request.correlation.feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import net.saliman.spring.request.correlation.support.RequestCorrelationConsts;
 import net.saliman.spring.request.correlation.support.RequestCorrelationProperties;
 import net.saliman.spring.request.correlation.support.RequestCorrelationUtils;
 import org.springframework.util.Assert;
@@ -55,12 +54,12 @@ public class FeignCorrelationInterceptor implements RequestInterceptor {
 
 		final String sessionId = RequestCorrelationUtils.getCurrentSessionId();
 		if ( sessionId != null ) {
-			template.header(RequestCorrelationConsts.SESSION_HEADER_NAME, sessionId);
+			template.header(properties.getSessionHeaderName(), sessionId);
 		}
 
 		final String requestId = RequestCorrelationUtils.getCurrentRequestId();
 		if ( requestId != null ) {
-			template.header(RequestCorrelationConsts.REQUEST_HEADER_NAME, requestId);
+			template.header(properties.getRequestHeaderName(), requestId);
 		}
 	}
 }

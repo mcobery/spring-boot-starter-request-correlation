@@ -15,11 +15,14 @@
  */
 package net.saliman.spring.request.correlation.support;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 /**
  * The request correlation properties.
  *
  * @author Jakub Narloch
  */
+@ConfigurationProperties(prefix = "request.correlation")
 public class RequestCorrelationProperties {
 
     /**
