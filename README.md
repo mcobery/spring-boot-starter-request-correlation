@@ -52,11 +52,21 @@ public class Application {
 
 You can configure fallowing options:
 
-```
-request.correlation.session.header-name=X-Session-Id # sets the header name to be used for session identification (X-Session-Id by default)
-request.correlation.request.header-name=X-Request-Id # sets the header name to be used for request identification (X-Request-Id by default)
-request.correlation.client.http.enabled=true  # enables the RestTemplate header propagation (true by default)
-request.correlation.client.feign.enabled=true # enables the Fegin header propagation (true by default)
+```yaml
+request:
+  correlation:
+    # sets the header name to be used for request identification (X-Request-Id by default)
+    requestHeaderName: X-Request-Id
+    # sets the header name to be used for session identification (X-Session-Id by default)
+    sessionHeaderName: X-Session-Id
+    client:
+      http:
+        # enables the RestTemplate header propagation (true by default)
+        enabled: true
+      feign:
+        # enables the Fegin header propagation (true by default)
+        enabled: true
+
 ```
 
 ## How it works?
