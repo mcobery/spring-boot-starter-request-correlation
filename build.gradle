@@ -27,7 +27,7 @@ sourceCompatibility = 1.7
 
 def mavenRepoUploadUrl = "scp://maxdevcloud/var/www/maven/repo"
 def mavenRepoUploadUser = "git"
-def privateKeyFile='c:/home/ssaliman/.ssh/id_rsa'
+
 group = "net.saliman"
 archivesBaseName="spring-boot-starter-request-correlation"
 version = '1.1.1'
