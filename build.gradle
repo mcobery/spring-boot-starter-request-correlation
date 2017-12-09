@@ -2,11 +2,13 @@ buildscript {
     repositories {
         jcenter()
     }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6'
+    }
 }
 
 plugins {
     id "com.github.hierynomus.license" version "0.11.0"
-    id 'net.researchgate.release' version '2.1.2'
     id 'com.github.kt3k.coveralls' version '2.4.0'
 }
 
@@ -15,8 +17,8 @@ apply plugin: "jacoco"
 apply plugin: 'idea'
 
 apply from: 'libraries.gradle'
-apply from: 'gradle/license.gradle'
-apply from: 'gradle/release.gradle'
+apply from: 'license.gradle'
+apply from: 'release.gradle'
 
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
@@ -25,16 +27,10 @@ apply plugin: 'com.github.kt3k.coveralls'
 
 sourceCompatibility = 1.7
 
-def mavenRepoUploadUrl = "scp://maxdevcloud/var/www/maven/repo"
-def mavenRepoUploadUser = "git"
-
+// Release version that won't conflict with the bintray plugin
 group = "net.saliman"
-archivesBaseName="spring-boot-starter-request-correlation"
+archivesBaseName = "spring-boot-starter-request-correlation"
 version = '1.1.1'
-
-ext {
-    isReleaseVersion = !version.endsWith("SNAPSHOT")
-}
 
 jar {
     manifest {
@@ -56,7 +52,6 @@ compileJava {
 }
 
 dependencies {
-
     compile (libraries.springBootWeb)
     compile (libraries.springCloudFeign)
     // For whatever reason, the Feign starter still brings in an old version
@@ -70,8 +65,8 @@ dependencies {
     testCompile (libraries.mockito)
 
 		// Dependencies needed to upload to a maven reposotory.
-	  archives "org.apache.maven.wagon:wagon-ssh:2.2"
-		archives "org.apache.maven.wagon:wagon-ssh-external:2.2"
+	  archives "org.apache.maven.wagon:wagon-ssh:2.8"
+		archives "org.apache.maven.wagon:wagon-ssh-external:2.8"
 }
 
 findbugs {
@@ -83,22 +78,5 @@ jacocoTestReport {
         xml.enabled = true
         html.enabled = true
     }
-}
-
-// Upload to the remote Maven repository. We change up the pom dependencies 
-// to make sure it is right on the server.
-uploadArchives {
-  doFirst {
-    repositories {
-      mavenDeployer {
-        configuration = project.configurations.archives
-        repository(url: mavenRepoUploadUrl) {
-          authentication(userName: mavenRepoUploadUser,
-                         privateKey: file("${privateKeyFile}"),
-                   passphrase: "${privateKeyPassphrase}")
-        }
-			}
-		}
-	}
 }
 
