@@ -38,15 +38,17 @@ import static org.mockito.Mockito.*;
  * Tests the {@link ClientHttpRequestCorrelationInterceptor} class.
  *
  * @author Jakub Narloch
+ * @author Steven C. Saliman
  */
 public class ClientHttpRequestCorrelationInterceptorTest {
-
+    private static final String SESSION_ID = "TEST_SESSION_ID";
+    private static final String REQUEST_ID = "TEST_REQUEST_ID";
+    private RequestCorrelationProperties properties = new RequestCorrelationProperties();
     private ClientHttpRequestCorrelationInterceptor instance;
 
     @Before
     public void setUp() throws Exception {
-        instance = new ClientHttpRequestCorrelationInterceptor(new RequestCorrelationProperties());
-
+        instance = new ClientHttpRequestCorrelationInterceptor(properties);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
     }
 
@@ -60,9 +62,7 @@ public class ClientHttpRequestCorrelationInterceptorTest {
     public void shouldSetHeader() throws IOException {
 
         // given
-        final String sessionId = UUID.randomUUID().toString();
-        final String requestId = UUID.randomUUID().toString();
-        CorrelationTestUtils.setCorrelatingIds(sessionId, requestId);
+        CorrelationTestUtils.setCorrelatingIds(SESSION_ID, REQUEST_ID);
 
         final HttpRequest request = mock(HttpRequest.class);
         final ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
@@ -75,11 +75,41 @@ public class ClientHttpRequestCorrelationInterceptorTest {
 
         // then
         assertTrue(request.getHeaders().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
-        assertEquals(sessionId, request.getHeaders().getFirst(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertEquals(SESSION_ID, request.getHeaders().getFirst(RequestCorrelationConsts.SESSION_HEADER_NAME));
         assertTrue(request.getHeaders().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
-        assertEquals(requestId, request.getHeaders().getFirst(RequestCorrelationConsts.REQUEST_HEADER_NAME));
+        assertEquals(REQUEST_ID, request.getHeaders().getFirst(RequestCorrelationConsts.REQUEST_HEADER_NAME));
         verify(execution).execute(request, body);
     }
+
+    @Test
+    public void shouldSetCustomHeader() throws IOException {
+
+        // given
+        final String customSessionHeader = "My-Session";
+        final String customRequestHeader = "My-Request";
+        properties.setSessionHeaderName(customSessionHeader);
+        properties.setRequestHeaderName(customRequestHeader);
+        CorrelationTestUtils.setCorrelatingIds(SESSION_ID, REQUEST_ID);
+
+        final HttpRequest request = mock(HttpRequest.class);
+        final ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
+        final byte[] body = new byte[0];
+
+        when(request.getHeaders()).thenReturn(new HttpHeaders());
+
+        // when
+        instance.intercept(request, body, execution);
+
+        // then
+        assertFalse(request.getHeaders().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertTrue(request.getHeaders().containsKey(customSessionHeader));
+        assertEquals(SESSION_ID, request.getHeaders().getFirst(customSessionHeader));
+        assertFalse(request.getHeaders().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
+        assertTrue(request.getHeaders().containsKey(customRequestHeader));
+        assertEquals(REQUEST_ID, request.getHeaders().getFirst(customRequestHeader));
+        verify(execution).execute(request, body);
+    }
+
 
     @Test
     public void shouldNotSetHeader() throws IOException {

@@ -3,13 +3,18 @@
 > A Spring Cloud starter for easy setup request correlation
 
 ## News
+**December 9, 2017** Version 1.1.1 now uses the custom header names correctly
+when they are changed in the application properties, with thanks to Mohamed
+El-Habib (@mohamed-el-habib)
+
 **June 27, 2017** Version 1.1.0 of this starter now works with Spring Boot 1.4 
 and 1.5. to use this starter with spring boot 1.3, you will need version 1.0.0.
 
 ## Features
 
-This project is derived from Jakub Narloch's jmnarloch/request-correlation-spring-cloud-starter project.  It adds the notion of a correlating session id in 
-addition to the correlating request id.
+This project is derived from Jakub Narloch's jmnarloch/request-correlation-spring-cloud-starter project. 
+It adds the notion of a correlating session id in addition to the correlating 
+request id.
 
 This starter allows to uniquely identify and track your request by passing 
 `X-Request-Id` and `X-Session-Id` headers across remote calls. 
@@ -32,7 +37,7 @@ Add the Spring Boot starter to your project:
 <dependency>
   <groupId>net.saliman</groupId>
   <artifactId>spring-boot-starter-request-correlation</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```
 
@@ -69,7 +74,7 @@ request:
 
 ```
 
-## How it works?
+## How does it work?
 
 The annotation will auto register servlet filter that will process any inbound request and correlate it with
 unique identifier.

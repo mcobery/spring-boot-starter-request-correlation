@@ -36,15 +36,17 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link FeignCorrelationInterceptor} class.
  *
  * @author Jakub Narloch
+ * @author Steven C. Saliman
  */
 public class FeignCorrelationInterceptorTest {
-
+    private static final String SESSION_ID = "TEST_SESSION_ID";
+    private static final String REQUEST_ID = "TEST_REQUEST_ID";
+    private RequestCorrelationProperties properties = new RequestCorrelationProperties();
     private FeignCorrelationInterceptor instance;
 
     @Before
     public void setUp() throws Exception {
-
-        instance = new FeignCorrelationInterceptor(new RequestCorrelationProperties());
+        instance = new FeignCorrelationInterceptor(properties);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
     }
 
@@ -58,9 +60,7 @@ public class FeignCorrelationInterceptorTest {
     public void shouldSetHeader() {
 
         // given
-        final String sessionId = "TEST_SESSION_ID";
-        final String requestId = "TEST_REQUEST_ID";
-        CorrelationTestUtils.setCorrelatingIds(sessionId, requestId);
+        CorrelationTestUtils.setCorrelatingIds(SESSION_ID, REQUEST_ID);
         final RequestTemplate request = new RequestTemplate();
 
         // when
@@ -69,10 +69,35 @@ public class FeignCorrelationInterceptorTest {
         // then
         assertTrue(request.headers().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
         assertEquals(1, request.headers().get(RequestCorrelationConsts.SESSION_HEADER_NAME).size());
-        assertEquals(sessionId, request.headers().get(RequestCorrelationConsts.SESSION_HEADER_NAME).iterator().next());
+        assertEquals(SESSION_ID, request.headers().get(RequestCorrelationConsts.SESSION_HEADER_NAME).iterator().next());
         assertTrue(request.headers().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
         assertEquals(1, request.headers().get(RequestCorrelationConsts.REQUEST_HEADER_NAME).size());
-        assertEquals(requestId, request.headers().get(RequestCorrelationConsts.REQUEST_HEADER_NAME).iterator().next());
+        assertEquals(REQUEST_ID, request.headers().get(RequestCorrelationConsts.REQUEST_HEADER_NAME).iterator().next());
+    }
+
+    @Test
+    public void shouldSetCustomHeader() {
+
+        // given
+        final String customSessionHeader = "My-Session";
+        final String customRequestHeader = "My-Request";
+        properties.setSessionHeaderName(customSessionHeader);
+        properties.setRequestHeaderName(customRequestHeader);
+        CorrelationTestUtils.setCorrelatingIds(SESSION_ID, REQUEST_ID);
+        final RequestTemplate request = new RequestTemplate();
+
+        // when
+        instance.apply(request);
+
+        // then
+        assertFalse(request.headers().containsKey(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertTrue(request.headers().containsKey(customSessionHeader));
+        assertEquals(1, request.headers().get(customSessionHeader).size());
+        assertEquals(SESSION_ID, request.headers().get(customSessionHeader).iterator().next());
+        assertFalse(request.headers().containsKey(RequestCorrelationConsts.REQUEST_HEADER_NAME));
+        assertTrue(request.headers().containsKey(customRequestHeader));
+        assertEquals(1, request.headers().get(customRequestHeader).size());
+        assertEquals(REQUEST_ID, request.headers().get(customRequestHeader).iterator().next());
     }
 
     @Test

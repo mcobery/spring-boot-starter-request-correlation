@@ -30,7 +30,7 @@ def mavenRepoUploadUser = "git"
 def privateKeyFile='c:/home/ssaliman/.ssh/id_rsa'
 group = "net.saliman"
 archivesBaseName="spring-boot-starter-request-correlation"
-version = '1.1.0'
+version = '1.1.1'
 
 ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
