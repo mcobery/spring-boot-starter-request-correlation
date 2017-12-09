@@ -15,7 +15,6 @@
  */
 package net.saliman.spring.request.correlation.http;
 
-import net.saliman.spring.request.correlation.support.RequestCorrelationConsts;
 import net.saliman.spring.request.correlation.support.RequestCorrelationProperties;
 import net.saliman.spring.request.correlation.support.RequestCorrelationUtils;
 import org.springframework.http.HttpRequest;
@@ -60,13 +59,13 @@ public class ClientHttpRequestCorrelationInterceptor implements ClientHttpReques
         // sets the correlation id
         final String sessionId = RequestCorrelationUtils.getCurrentSessionId();
         if(sessionId != null) {
-            request.getHeaders().add(RequestCorrelationConsts.SESSION_HEADER_NAME, sessionId);
+            request.getHeaders().add(properties.getSessionHeaderName(), sessionId);
         }
 
         // sets the correlation id
         final String requestId = RequestCorrelationUtils.getCurrentRequestId();
         if(requestId != null) {
-            request.getHeaders().add(RequestCorrelationConsts.REQUEST_HEADER_NAME, requestId);
+            request.getHeaders().add(properties.getRequestHeaderName(), requestId);
         }
 
         // proceeds with execution

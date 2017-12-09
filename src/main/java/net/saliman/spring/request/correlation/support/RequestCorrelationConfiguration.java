@@ -40,16 +40,12 @@ import java.util.List;
  * @see EnableRequestCorrelation
  */
 @Configuration
-@EnableConfigurationProperties
+@EnableConfigurationProperties(RequestCorrelationProperties.class)
 public class RequestCorrelationConfiguration {
 
     @Autowired(required = false)
     private List<RequestCorrelationInterceptor> interceptors = new ArrayList<>();
 
-    @Bean
-    public RequestCorrelationProperties requestCorrelationProperties() {
-        return new RequestCorrelationProperties();
-    }
 
     @Bean
     @ConditionalOnMissingBean(CorrelationIdGenerator.class)
