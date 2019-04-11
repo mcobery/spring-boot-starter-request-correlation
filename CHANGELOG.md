@@ -1,3 +1,8 @@
+Changes for 1.1.2
+=================
+- Updated the Gradle Wrapper to version 5.3 and changed the gradle publishing
+  mechanism to use the newer maven-publish plugin.
+  
 Changes for 1.1.1
 =================
 - Fixed a bug that ignored custom header names in the application properties,

@@ -3,6 +3,10 @@
 > A Spring Cloud starter for easy setup request correlation
 
 ## News
+**April 11, 2019**  Version 1.1.2 is a minor release that updated the Gradle
+wrapper from the long obsolete 2.9 version.  It also uses Gradle's new 
+publishing mechanism to publish its artifacts.
+
 **December 9, 2017** Version 1.1.1 now uses the custom header names correctly
 when they are changed in the application properties, with thanks to Mohamed
 El-Habib (@mohamed-el-habib)
@@ -37,7 +41,7 @@ Add the Spring Boot starter to your project:
 <dependency>
   <groupId>net.saliman</groupId>
   <artifactId>spring-boot-starter-request-correlation</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
 </dependency>
 ```
 

@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
@@ -25,15 +25,11 @@ apply plugin: 'pmd'
 
 apply plugin: 'com.github.kt3k.coveralls'
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
-def mavenRepoUploadUrl = "scp://maxdevcloud/var/www/maven/repo"
-def mavenRepoUploadUser = "git"
-def privateKeyFile='/home/ssaliman/.ssh/id_rsa'
 // Release version that won't conflict with the bintray plugin
 group = "net.saliman"
 archivesBaseName = "spring-boot-starter-request-correlation"
-version = '1.1.1'
 
 jar {
     manifest {
@@ -67,9 +63,6 @@ dependencies {
     testCompile (libraries.junit)
     testCompile (libraries.mockito)
 
-		// Dependencies needed to upload to a maven reposotory.
-	  archives "org.apache.maven.wagon:wagon-ssh:2.8"
-		archives "org.apache.maven.wagon:wagon-ssh-external:2.8"
 }
 
 findbugs {
