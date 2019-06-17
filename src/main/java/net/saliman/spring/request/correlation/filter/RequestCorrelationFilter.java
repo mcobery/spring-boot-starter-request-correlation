@@ -48,7 +48,7 @@ public class RequestCorrelationFilter implements Filter {
 	/**
 	 * Logger instance used by this class.
 	 */
-	private final Logger logger = LoggerFactory.getLogger(RequestCorrelationFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(RequestCorrelationFilter.class);
 
 	/**
 	 * The request generator used for generating new identifiers.

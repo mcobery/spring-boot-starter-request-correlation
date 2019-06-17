@@ -53,6 +53,7 @@ compileJava {
 dependencies {
     compile (libraries.springBootWeb)
     compile (libraries.springCloudFeign)
+    compile (libraries.springCloudRibbon)
     // For whatever reason, the Feign starter still brings in an old version
     // of the http client.  We'll want to remove this from time to time to 
 		// see if Feign starts bringing in the right version on its own.
