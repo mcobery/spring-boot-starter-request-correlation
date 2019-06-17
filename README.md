@@ -3,6 +3,8 @@
 > A Spring Cloud starter for easy setup request correlation
 
 ## News
+**June 17, 2019**  Version 2.0.0 now supports Spring Boot version 2.
+
 **April 11, 2019**  Version 1.1.2 is a minor release that updated the Gradle
 wrapper from the long obsolete 2.9 version.  It also uses Gradle's new 
 publishing mechanism to publish its artifacts.
@@ -16,9 +18,9 @@ and 1.5. to use this starter with spring boot 1.3, you will need version 1.0.0.
 
 ## Features
 
-This project is derived from Jakub Narloch's jmnarloch/request-correlation-spring-cloud-starter project. 
-It adds the notion of a correlating session id in addition to the correlating 
-request id.
+This project is derived from Jakub Narloch's 
+jmnarloch/request-correlation-spring-cloud-starter project.  It adds the notion
+of a correlating session id in addition to the correlating request id.
 
 This starter allows to uniquely identify and track your request by passing 
 `X-Request-Id` and `X-Session-Id` headers across remote calls. 
@@ -41,13 +43,14 @@ Add the Spring Boot starter to your project:
 <dependency>
   <groupId>net.saliman</groupId>
   <artifactId>spring-boot-starter-request-correlation</artifactId>
-  <version>1.1.2</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
 ## Usage
 
-Annotate every Spring Boot / Cloud Application with `@EnableRequestCorrelation` annotation. That's it.
+Annotate every Spring Boot / Cloud Application with `@EnableRequestCorrelation` 
+annotation. That's it.
 
 ```java
 @EnableRequestCorrelation
@@ -65,9 +68,9 @@ You can configure fallowing options:
 request:
   correlation:
     # sets the header name to be used for request identification (X-Request-Id by default)
-    requestHeaderName: X-Request-Id
+    request-header-name: X-Request-Id
     # sets the header name to be used for session identification (X-Session-Id by default)
-    sessionHeaderName: X-Session-Id
+    session-header-name: X-Session-Id
     client:
       http:
         # enables the RestTemplate header propagation (true by default)
@@ -80,29 +83,35 @@ request:
 
 ## How does it work?
 
-The annotation will auto register servlet filter that will process any inbound request and correlate it with
-unique identifier.
+The annotation will auto register servlet filter that will process any inbound 
+request and correlate it with unique identifier.
 
 ## Retrieving the request identifier
 
 You can retrieve the current request id within any request bound thread through 
-`RequestCorrelationUtils.getCurrentCorrelationId`.
+`RequestCorrelationUtils.getCurrentRequestId`.  You can retrieve the current 
+session id through `RequestCorrelationUtils.getCurrentSessionId`
 
 ## Propagation
 
 Besides that you will also have transparent integration with fallowing:
 
-* RestTemplate - any Spring configured `RestTemplate` will be automatically populated with the request id.
-* Feign clients - similarly a request interceptor is being registered for Feign clients
+* RestTemplate - any Spring configured `RestTemplate` will be automatically
+  populated with the request id.
+* Feign clients - similarly a request interceptor is being registered for Feign
+  clients
 * Zuul proxy - any configured route will be also 'enriched' with the identifier
 
 ## Applications
 
-The extension itself simply gives you means to propagate the information. How you going to use it is up to you.
+The extension itself simply gives you means to propagate the information. How 
+you going to use it is up to you.
 
-For instance you can apply this information to your logging MDC map. You can achieve that by registering 
-`RequestCorrelationInterceptor` bean. The `RequestCorrelationInterceptor` gives you only an entry point so that
-any fallowing operation would be able to access the correlation identifier. You may also use Spring's
+For instance you can apply this information to your logging MDC map. You can 
+achieve that by registering `RequestCorrelationInterceptor` bean. The 
+`RequestCorrelationInterceptor` gives you only an entry point so that
+any fallowing operation would be able to access the correlation identifier. You
+may also use Spring's
 [HandlerInterceptor](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html)
 and set the value there.
 
@@ -111,8 +120,9 @@ and set the value there.
 public RequestCorrelationInterceptor correlationLoggingInterceptor() {
     return new RequestCorrelationInterceptor() {
         @Override
-        public void afterCorrelationIdSet(String correlationId) {
-            MDC.put("correlationId", correlationId);
+        public void afterCorrelationIdSet(String sessionId, String requestId) {
+            MDC.put("httpSessionId", sessionId);
+            MDC.put("httpRequestId", requestId);
         }
     };
 }
@@ -132,11 +142,13 @@ public ResponseEntity error(Exception ex) {
 }
 ```
 
-Another use case is to save that with your Spring Boot Actuator's audits when you implement custom `AuditEventRepository`.
+Another use case is to save that with your Spring Boot Actuator's audits when
+you implement custom `AuditEventRepository`.
 
 ## Migrating to 1.1
 
-The properties enable has been renamed to enabled to match the Spring convention, besides that there are active by default
+The properties enable has been renamed to enabled to match the Spring 
+convention, besides that there are active by default
 
 ## License
 
