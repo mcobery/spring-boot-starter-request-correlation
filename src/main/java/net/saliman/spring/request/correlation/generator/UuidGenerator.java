@@ -18,6 +18,7 @@ package net.saliman.spring.request.correlation.generator;
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 /**
@@ -28,14 +29,15 @@ import java.util.UUID;
 public class UuidGenerator implements CorrelationIdGenerator {
 
     /**
-     * Generates new request id as random UUID.
+     * Generates new session id from the session's id.
      *
-     * @return random uuid
+     * @return The session id.
      */
     @Override
     public String generateSessionId(HttpServletRequest request) {
-
-        return request.getSession().getId();
+        HttpSession session = request.getSession();
+        String id = session.getId();
+        return id;
     }
 
     /**

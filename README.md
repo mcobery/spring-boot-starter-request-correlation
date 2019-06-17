@@ -3,7 +3,9 @@
 > A Spring Cloud starter for easy setup request correlation
 
 ## News
-**June 17, 2019**  Version 2.0.0 now supports Spring Boot version 2.
+**June 17, 2019**  Version 2.0.0 now supports Spring Boot version 2, and adds
+two new properties for controlling the position of the Request Correlation
+Filter so that this project can play nicely with the spring-session project. 
 
 **April 11, 2019**  Version 1.1.2 is a minor release that updated the Gradle
 wrapper from the long obsolete 2.9 version.  It also uses Gradle's new 
@@ -67,6 +69,10 @@ You can configure fallowing options:
 ```yaml
 request:
   correlation:
+    # sets the position in the filter chain for the Request Correlation Filter (Ordered.HIGHEST_PRECEDENCE by default)
+    filter-order: 102
+    # sets the starting position for the filter order. Defaults to "zero"
+    filter-order-from: highest_precedence
     # sets the header name to be used for request identification (X-Request-Id by default)
     request-header-name: X-Request-Id
     # sets the header name to be used for session identification (X-Session-Id by default)
@@ -80,6 +86,12 @@ request:
         enabled: true
 
 ```
+
+Note that the above example shows a configuration that will put the Request 
+Correlation filter after the Spring Session filter (at highest precedence + 102).
+Failing to set these values will result in the Request Correlation filter 
+getting the wrong request object, since the Spring Session filter hasn't run 
+yet, and the ids will be wrong.
 
 ## How does it work?
 

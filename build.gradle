@@ -59,6 +59,7 @@ dependencies {
 		// see if Feign starts bringing in the right version on its own.
     compile (libraries.apacheHttpClient)
     compile (libraries.commonsLang)
+		annotationProcessor (libraries.springConfigurationProcessor)
 
     testCompile (libraries.springBootTest)
     testCompile (libraries.junit)

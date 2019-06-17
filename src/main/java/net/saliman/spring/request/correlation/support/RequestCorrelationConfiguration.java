@@ -42,6 +42,8 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(RequestCorrelationProperties.class)
 public class RequestCorrelationConfiguration {
+    @Autowired
+    private RequestCorrelationProperties properties;
 
     @Autowired(required = false)
     private List<RequestCorrelationInterceptor> interceptors = new ArrayList<>();
@@ -61,14 +63,14 @@ public class RequestCorrelationConfiguration {
 
     @Bean
     public FilterRegistrationBean requestCorrelationFilterBean(RequestCorrelationFilter correlationFilter) {
-
         final FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
         filterRegistration.setFilter(correlationFilter);
         filterRegistration.setMatchAfter(false);
         filterRegistration.setDispatcherTypes(
                 EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC));
         filterRegistration.setAsyncSupported(true);
-        filterRegistration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        int filterOrder = properties.getFilterOrderFrom().offset + properties.getFilterOrder();
+        filterRegistration.setOrder(filterOrder);
         return filterRegistration;
     }
 }
