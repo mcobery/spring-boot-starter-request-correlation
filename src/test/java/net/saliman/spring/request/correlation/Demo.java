@@ -19,6 +19,7 @@ import com.netflix.loadbalancer.BaseLoadBalancer;
 import com.netflix.loadbalancer.ILoadBalancer;
 import com.netflix.loadbalancer.Server;
 import net.saliman.spring.request.correlation.api.EnableRequestCorrelation;
+import net.saliman.spring.request.correlation.support.RequestCorrelationConsts;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,16 +117,16 @@ public class Demo {
 
         @RequestMapping(value = "/", method = RequestMethod.GET)
         public ResponseEntity<String> headerEcho(
-                @RequestHeader(value = "X-Session-Id") String sessionId,
-                @RequestHeader(value = "X-Request-Id") String requestId) {
+                @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
+                @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
             return ResponseEntity.ok(sessionId + ":" + requestId);
         }
 
         @RequestMapping(value = "/rest", method = RequestMethod.GET)
         public ResponseEntity propagateRestTemplate(
-                @RequestHeader(value = "X-Session-Id") String sessionId,
-                @RequestHeader(value = "X-Request-Id") String requestId) {
+                @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
+                @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
             final String expectedResponse = sessionId + ":" + requestId;
             final String response = restTemplate().getForObject(url("/"), String.class);
@@ -137,8 +138,8 @@ public class Demo {
 
         @RequestMapping(value = "/feign", method = RequestMethod.GET)
         public ResponseEntity propagateFeignClient(
-                @RequestHeader(value = "X-Session-Id") String sessionId,
-                @RequestHeader(value = "X-Request-Id") String requestId) {
+                @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
+                @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
             final String expectedResponse = sessionId + ":" + requestId;
             final String response = feignClient.getRequestId();

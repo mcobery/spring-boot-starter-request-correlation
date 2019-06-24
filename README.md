@@ -5,7 +5,7 @@
 ## News
 **June 17, 2019**  Version 2.0.0 now supports Spring Boot version 2, and adds
 two new properties for controlling the position of the Request Correlation
-Filter so that this project can play nicely with the spring-session project. 
+Filter so that this project can play nicely with the spring-session project.
 
 **April 11, 2019**  Version 1.1.2 is a minor release that updated the Gradle
 wrapper from the long obsolete 2.9 version.  It also uses Gradle's new 
