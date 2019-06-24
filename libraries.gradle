@@ -1,14 +1,14 @@
 ext {
 	libraries = [
 		apacheHttpClient: 'org.apache.httpcomponents:httpclient:4.5.3',
-		springBootWeb   : 'org.springframework.boot:spring-boot-starter-web:2.1.5.RELEASE',
-		springConfigurationProcessor: 'org.springframework.boot:spring-boot-configuration-processor:2.1.5.RELEASE',
+		springBootWeb   : 'org.springframework.boot:spring-boot-starter-web:2.1.6.RELEASE',
+		springConfigurationProcessor: 'org.springframework.boot:spring-boot-configuration-processor:2.1.6.RELEASE',
 		springCloudFeign: 'org.springframework.cloud:spring-cloud-starter-openfeign:2.1.1.RELEASE',
 		springCloudRibbon: 'org.springframework.cloud:spring-cloud-starter-netflix-ribbon:2.1.1.RELEASE',
 
 		commonsLang     : 'org.apache.commons:commons-lang3:3.4',
 
-		springBootTest  : 'org.springframework.boot:spring-boot-starter-test:2.1.5.RELEASE',
+		springBootTest  : 'org.springframework.boot:spring-boot-starter-test:2.1.6.RELEASE',
 		junit           : 'junit:junit:4.12',
 		mockito         : 'org.mockito:mockito-all:1.10.19'
 	]
