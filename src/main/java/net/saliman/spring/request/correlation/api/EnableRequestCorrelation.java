@@ -26,9 +26,9 @@ import java.lang.annotation.*;
 /**
  * Enables automatic request correlation by assigning per each request unique identifier that afterwards is being
  * propagated through 'X-Request-Id' header.
- *
+ * <p>
  * By default the identifier will be generated using random {@code UUID}.
- *
+ * <p>
  * The header will be automatically propagated through any Spring configured {@link RestTemplate} bean or Feign client.
  *
  * @author Jakub Narloch

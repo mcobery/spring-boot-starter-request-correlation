@@ -1,94 +1,42 @@
-# Created by .ignore support plugin (hsz.mobi)
-### Gradle template
-.gradle
-build/
+######################
+# Local configuration
+######################
+gradle-local.properties
+application-local.yml
 
-# Ignore Gradle GUI config
-gradle-app.setting
+######################
+# Node
+######################
+/node/
+node_tmp/
+node_modules/
+npm-debug.log.*
+/.awcache/*
+/.cache-loader/*
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+######################
+# SASS
+######################
+.sass-cache/
 
-
-### NetBeans template
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-nbactions.xml
-nb-configuration.xml
-.nb-gradle/
-
-
-### JetBrains template
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
-
-*.iml
-
-## Directory-based project format:
-.idea/
-# if you remove the above rule, at least ignore the following:
-
-# User-specific stuff:
-# .idea/workspace.xml
-# .idea/tasks.xml
-# .idea/dictionaries
-
-# Sensitive or high-churn files:
-# .idea/dataSources.ids
-# .idea/dataSources.xml
-# .idea/sqlDataSources.xml
-# .idea/dynamic.xml
-# .idea/uiDesigner.xml
-
-# Gradle:
-# .idea/gradle.xml
-# .idea/libraries
-
-# Mongo Explorer plugin:
-# .idea/mongoSettings.xml
-
-## File-based project format:
-*.ipr
-*.iws
-
-## Plugin-specific files:
-
-# IntelliJ
-/out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-
-
-### Eclipse template
+######################
+# Eclipse
+######################
 *.pydevproject
+.project
 .metadata
-.gradle
-bin/
 tmp/
+tmp/**/*
 *.tmp
-*.bak
-*.swp
 *~.nib
 local.properties
+.classpath
 .settings/
 .loadpath
-
-# Eclipse Core
-.project
+.factorypath
 
 # External tool builders
-.externalToolBuilders/
+.externalToolBuilders/**
 
 # Locally stored "Eclipse launch configurations"
 *.launch
@@ -96,16 +44,108 @@ local.properties
 # CDT-specific
 .cproject
 
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
-
 # PDT-specific
 .buildpath
 
-# sbteclipse plugin
-.target
+# STS-specific
+/.sts4-cache/*
 
-# TeXlipse plugin
-.texlipse
+######################
+# IntelliJ
+######################
+.idea/
+*.iml
+*.iws
+*.ipr
+*.ids
+*.orig
+classes/
+out/
 
+######################
+# Visual Studio Code
+######################
+.vscode/*
 
+######################
+# Maven
+######################
+/log/
+/target/
+
+######################
+# Gradle
+######################
+.gradle/
+/build/
+
+######################
+# Package Files
+######################
+*.jar
+*.war
+*.ear
+*.db
+
+######################
+# Windows
+######################
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+######################
+# Mac OSX
+######################
+.DS_Store
+.svn
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+######################
+# Directories
+######################
+/bin/
+/deploy/
+
+######################
+# Logs
+######################
+*.log*
+
+######################
+# Others
+######################
+*.bak
+*.class
+*.*~
+*~
+.merge_file*
+*.lock
+*.swp
+
+######################
+# ESLint
+######################
+.eslintcache
+
+######################
+# Code coverage
+######################
+/coverage/
+/.nyc_output/
+
+###########################
+# Gradle and Maven wrappers
+###########################
+# These are exception patterns that must come after the normal patterns.
+!.mvn/wrapper/maven-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties

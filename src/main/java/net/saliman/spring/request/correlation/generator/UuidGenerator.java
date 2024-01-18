@@ -15,10 +15,10 @@
  */
 package net.saliman.spring.request.correlation.generator;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 /**

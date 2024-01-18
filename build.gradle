@@ -20,16 +20,29 @@ apply from: 'libraries.gradle'
 apply from: 'license.gradle'
 apply from: 'release.gradle'
 
-apply plugin: 'findbugs'
 apply plugin: 'pmd'
 
 apply plugin: 'com.github.kt3k.coveralls'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 17
 
 // Release version that won't conflict with the bintray plugin
 group = "net.saliman"
 archivesBaseName = "spring-boot-starter-request-correlation"
+
+// Java 17 started getting a lot pickier about opening classes to other classes.  Tests will need
+// some "opens" to work properly.
+tasks.withType(Test).configureEach{
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.lang=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.lang.invoke=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.util=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.net=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.nio.charset=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.time=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.base/java.util.stream=ALL-UNNAMED']
+    jvmArgs = jvmArgs + ['--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED']
+}
 
 jar {
     manifest {
@@ -51,30 +64,18 @@ compileJava {
 }
 
 dependencies {
-    compile (libraries.springBootWeb)
-    compile (libraries.springCloudFeign)
-    compile (libraries.springCloudRibbon)
-    // For whatever reason, the Feign starter still brings in an old version
-    // of the http client.  We'll want to remove this from time to time to 
-		// see if Feign starts bringing in the right version on its own.
-    compile (libraries.apacheHttpClient)
-    compile (libraries.commonsLang)
-		annotationProcessor (libraries.springConfigurationProcessor)
+    implementation (libraries.springBootWeb)
+    implementation (libraries.springCloudFeign)
+    implementation (libraries.feignHttpClient)
 
-    testCompile (libraries.springBootTest)
-    testCompile (libraries.junit)
-    testCompile (libraries.mockito)
+    implementation (libraries.commonsLang)
+
+    annotationProcessor (libraries.springConfigurationProcessor)
+
+    testImplementation (libraries.springBootTest)
+    testImplementation (libraries.junit)
+    testImplementation (libraries.mockito)
 
 }
 
-findbugs {
-    ignoreFailures = true
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-}
 

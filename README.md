@@ -112,7 +112,6 @@ Besides that you will also have transparent integration with fallowing:
   populated with the request id.
 * Feign clients - similarly a request interceptor is being registered for Feign
   clients
-* Zuul proxy - any configured route will be also 'enriched' with the identifier
 
 ## Applications
 

@@ -1,6 +1,5 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-apply plugin: 'com.jfrog.bintray'
 
 ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
@@ -13,13 +12,13 @@ if ( isReleaseVersion ) {
     ext.mavenCentralUploadUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+tasks.register('javadocJar', Jar) {
+    archiveClassifier = 'javadoc'
     from javadoc
 }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
@@ -89,36 +88,7 @@ signing {
     sign publishing.publications.requestCorrelationStarter
 }
 
-// Configure BinTray publishing
-bintray {
-    user = project.hasProperty('bintrayUsername') ? project.getProperty('bintrayUsername') : ''
-    key = project.hasProperty('bintrayApiKey') ? project.getProperty('bintrayApiKey') : ''
-
-    publications = [ 'requestCorrelationStarter' ]
-    publish = true
-
-    pkg {
-        // repo = 'gradle-plugins'
-        repo = 'maven'
-        name = 'spring-boot-starter-request-correlation'
-        desc = 'A Spring Boot starter that can set correlation ids on outgoing requests.'
-        licenses = [ 'Apache-2.0' ]
-        websiteUrl = 'https://github.com/stevesaliman/spring-boot-starter-request-correlation'
-        issueTrackerUrl = 'https://github.com/stevesaliman/spring-boot-starter-request-correlation/issues'
-        vcsUrl = 'https://github.com/stevesaliman/spring-boot-starter-request-correlation.git'
-        labels = [ 'spring', 'spring-boot', 'coverage' ]
-        publicDownloadNumbers = true
-        version {
-            // name = version
-            // vcsTag = version
-            vcsTag = "Release_${version}"
-        }
-    }
-}
-
-
-// When we're ready to go, there are a couple of things we'll need to do before
-// we execute anything.
+// When we're ready to go, there are a couple of things we'll need to do before we execute anything.
 gradle.taskGraph.whenReady { taskGraph ->
     // Only *require* signing if we are uploading a non snapshot version.  If we
     // do need to sign, make sure we've got the properties we need to do the

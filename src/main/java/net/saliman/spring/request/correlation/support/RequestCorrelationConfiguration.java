@@ -15,6 +15,7 @@
  */
 package net.saliman.spring.request.correlation.support;
 
+import jakarta.servlet.DispatcherType;
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
 import net.saliman.spring.request.correlation.api.EnableRequestCorrelation;
 import net.saliman.spring.request.correlation.api.RequestCorrelationInterceptor;
@@ -26,9 +27,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 
-import javax.servlet.DispatcherType;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;

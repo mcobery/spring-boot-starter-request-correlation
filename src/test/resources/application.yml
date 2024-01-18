@@ -1,3 +1,14 @@
-request.correlation.header-name=X-Request-Id
-request.correlation.client.http.enable=true
-request.correlation.client.feign.enable=true
+server:
+  port: 10344
+
+request:
+  correlation:
+    client:
+      http:
+        enable: true
+      feign:
+        enable: true
+
+#request.correlation.client.http.enable=true
+#request.correlation.client.feign.enable=true
+#test.url=http://localhosts:${server.port}

@@ -15,7 +15,7 @@
  */
 package net.saliman.spring.request.correlation.api;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Request id generation abstraction, allows to implement different strategies for request id generation.

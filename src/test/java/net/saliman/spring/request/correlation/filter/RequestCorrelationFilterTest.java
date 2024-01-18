@@ -15,6 +15,8 @@
  */
 package net.saliman.spring.request.correlation.filter;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
 import net.saliman.spring.request.correlation.api.RequestCorrelation;
 import net.saliman.spring.request.correlation.api.RequestCorrelationInterceptor;
@@ -27,8 +29,6 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
