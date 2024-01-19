@@ -1,17 +1,15 @@
 /*
- * Copyright (c) 2017 the original author or authors
+ * Copyright (c) 2015-2024 the original author or authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.  See the License for the specific language governing permissions and limitations
+ * under the License.
  */
 package net.saliman.spring.request.correlation.filter;
 
@@ -20,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import net.saliman.spring.request.correlation.api.CorrelationIdGenerator;
 import net.saliman.spring.request.correlation.api.RequestCorrelation;
 import net.saliman.spring.request.correlation.api.RequestCorrelationInterceptor;
-import net.saliman.spring.request.correlation.generator.UuidGenerator;
+import net.saliman.spring.request.correlation.generator.DefaultIdGenerator;
 import net.saliman.spring.request.correlation.support.RequestCorrelationConsts;
 import net.saliman.spring.request.correlation.support.RequestCorrelationProperties;
 import org.junit.Before;
@@ -48,7 +46,7 @@ public class RequestCorrelationFilterTest {
 
     private RequestCorrelationFilter instance;
 
-    private CorrelationIdGenerator generator = new UuidGenerator();
+    private CorrelationIdGenerator generator = new DefaultIdGenerator();
 
     private List<RequestCorrelationInterceptor> interceptors = new ArrayList<>();
 
@@ -73,8 +71,8 @@ public class RequestCorrelationFilterTest {
 
         // then
         assertNotNull(request.getAttribute(RequestCorrelationConsts.ATTRIBUTE_NAME));
-        assertNotNull(((HttpServletRequest)chain.getRequest()).getHeader(RequestCorrelationConsts.SESSION_HEADER_NAME));
-        assertNotNull(((HttpServletRequest)chain.getRequest()).getHeader(RequestCorrelationConsts.REQUEST_HEADER_NAME));
+        assertNotNull(((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.SESSION_HEADER_NAME));
+        assertNotNull(((HttpServletRequest) chain.getRequest()).getHeader(RequestCorrelationConsts.REQUEST_HEADER_NAME));
     }
 
     @Test

@@ -1,6 +1,6 @@
 # Spring Cloud Request Correlation
 
-> A Spring Cloud starter for easy setup request correlation
+A Spring Cloud starter for easy request correlation ids
 
 ## News
 **January 19, 2024** Version 3.0.0 now supports Spring Boot version 3, and adds support for 
@@ -23,22 +23,19 @@ and 1.5. to use this starter with spring boot 1.3, you will need version 1.0.0.
 
 ## Features
 
-This project is derived from Jakub Narloch's 
-jmnarloch/request-correlation-spring-cloud-starter project.  It adds the notion
-of a correlating session id in addition to the correlating request id.
+This project is derived from Jakub Narloch's  jmnarloch/request-correlation-spring-cloud-starter
+project.  It adds the notion of a correlating session id in addition to the correlating request id.
 
-This starter allows to uniquely identify and track your request by passing 
-`X-Request-Id` and `X-Session-Id` headers across remote calls. 
+This starter allows you to uniquely identify and track your request by passing  `X-Request-Id` and
+`X-Session-Id` headers across remote calls. 
 
-The Request Id is meant to track a single request across multiple collaborating
-service calls.
+The Request id is meant to track a single request across multiple collaborating service calls.
 
-The Session Id is meant to track multiple requests made by a user across an
-application.
+The Session id is meant to track multiple requests made by a user across an application.
 
-For example, if a user logs into an application, requests an object from the 
-server, then saves the modified version of the object, the "find" request and
-the "save" request will have different request ids, but the same session id. 
+For example, if a user logs into an application, requests an object from the  server, then saves
+the modified version of the object, the "find" request and the "save" request will have different
+request ids, but the same session id. 
 
 ## Setup
 
@@ -50,10 +47,11 @@ dependencies {
 }
 ```
 
-This will make sure incoming requests have a correlating request id and session id.  To use these
-ids when making requests to collaborating services, add dependencies for the kind of calls you make:
+This will make sure incoming requests have a correlating request id and session id.  To propagate
+the ids to outgoing requests to collaborating services, add dependencies for the kind of calls you
+make:
 
-Feign:
+If you use Feign:
 ```groovy
 dependencies {
   implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${feignVersion}"
@@ -62,14 +60,14 @@ dependencies {
 
 ```
 
-Spring WebClients:
+If you use Spring WebClients:
 ```groovy
 dependencies {
   implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
 }
 ```
 
-Spring RestTemplates:
+If you use Spring RestTemplates:
 ```groovy
 dependencies {
   implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"  
@@ -78,9 +76,10 @@ dependencies {
 
 ## Usage
 
-Annotate every Spring Boot / Cloud Application with `@EnableRequestCorrelation` 
-annotation, then make sure the Feign / WebClient.Builder / RestTemplate instances are Spring beans.
-That's it.
+To use this starter, annotate every Spring Boot / Cloud Application with the 
+`@EnableRequestCorrelation` annotation.  If the application makes outgoing requests to collaborating
+services, the application will need to use a Spring managed Feign Client, WebClient.Builder, or
+RestTemplate.  An example of an application that uses all of the above is:
 
 ```java
 @EnableRequestCorrelation
@@ -97,7 +96,8 @@ public class Application {
 }
 ```
 
-You don't need all three beans in your services, only the ones you use in your application.
+In practice, the beans from above would go in serivces that are making outgoing requsts.  You don't
+need all three beans in your services, only the ones you use in your application.
 
 ## Properties
 
@@ -110,10 +110,10 @@ request:
     filter-order: 102
     # sets the starting position for the filter order. Defaults to "zero"
     filter-order-from: highest_precedence
-    # sets the header name to be used for request identification (X-Request-Id by default)
-    request-header-name: X-Request-Id
     # sets the header name to be used for session identification (X-Session-Id by default)
     session-header-name: X-Session-Id
+    # sets the header name to be used for request identification (X-Request-Id by default)
+    request-header-name: X-Request-Id
     client:
       http:
         # enables the RestTemplate header propagation (true by default)
@@ -124,22 +124,27 @@ request:
 
 ```
 
-Note that the above example shows a configuration that will put the Request 
-Correlation filter after the Spring Session filter (at highest precedence + 102).
-Failing to set these values will result in the Request Correlation filter 
-getting the wrong request object, since the Spring Session filter hasn't run 
-yet, and the ids will be wrong.
+Note that the above example shows a configuration that will put the Request Correlation filter after
+the Spring Session filter (at highest precedence + 102).  Failing to set these values will result in
+the Request Correlation filter getting the wrong request object, since the Spring Session filter
+hasn't run yet, and the ids will be wrong.
 
 ## How does it work?
 
-The annotation will auto register servlet filter that will process any inbound 
-request and correlate it with unique identifier.
+The annotation will auto register servlet filter that will process any inbound  request and
+correlate it with unique identifier.  If it finds Feign in the classpath, it registers a Feign
+interceptor.  If it finds Spring's RestTemplate in the classpath, it creates an interceptor for 
+Rest Templates.  If it finds Spring's WebClient in the classpath, it creates WebClientCustomizer
+that will be used in any Spring WebClient.Builder.
+
+Bean creation for each client type can be disabled with the appropriate setting in the 
+application.yml file.
 
 ## Retrieving the request identifier
 
 You can retrieve the current request id within any request bound thread through 
-`RequestCorrelationUtils.getCurrentRequestId`.  You can retrieve the current 
-session id through `RequestCorrelationUtils.getCurrentSessionId`
+`RequestCorrelationUtils.getCurrentRequestId`.  You can retrieve the current session id through
+`RequestCorrelationUtils.getCurrentSessionId`
 
 ## Propagation
 
@@ -154,16 +159,17 @@ Besides that you will also have transparent integration with following:
 
 ## Applications
 
-The extension itself simply gives you means to propagate the information. How 
-you going to use it is up to you.
+The extension itself simply gives you means to propagate the information. How you use it is up to
+you.
 
-For instance, you can apply this information to your logging MDC map. You can 
-achieve that by registering `RequestCorrelationInterceptor` bean. The 
-`RequestCorrelationInterceptor` gives you only an entry point so that
-any fallowing operation would be able to access the correlation identifier. You
-may also use Spring's
+For instance, you can apply this information to your logging MDC map. You can achieve that by
+registering `RequestCorrelationInterceptor` bean. The `RequestCorrelationInterceptor` gives you only
+an entry point so that any fallowing operation would be able to access the correlation identifier.
+You may also use Spring's 
 [HandlerInterceptor](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html)
 and set the value there.
+
+For example:
 
 ```java
 @Bean
@@ -178,7 +184,7 @@ public RequestCorrelationInterceptor correlationLoggingInterceptor() {
 }
 ```
 
-If your are using Vnd.errors you can use that as your logref value
+If you are using Vnd.errors you can use that as your logref value
 
 ```java
 @ExceptionHandler
@@ -192,13 +198,8 @@ public ResponseEntity error(Exception ex) {
 }
 ```
 
-Another use case is to save that with your Spring Boot Actuator's audits when
-you implement custom `AuditEventRepository`.
-
-## Migrating to 1.1
-
-The properties enable has been renamed to enabled to match the Spring 
-convention, besides that there are active by default
+Another use case is to save that with your Spring Boot Actuator's audits when you implement custom
+`AuditEventRepository`.
 
 ## License
 

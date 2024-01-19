@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2015-2024 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.  See the License for the specific language governing permissions and limitations
+ * under the License.
+ */
 package net.saliman.spring.request.correlation.demo;
 
 import net.saliman.spring.request.correlation.api.EnableRequestCorrelation;
@@ -39,7 +52,8 @@ public class DemoApplication {
 
     /**
      * A basic endpoint that gets the correlating request headers and returns them in a concatenated
-     * string.
+     * string.  This can be called directly to make sure the incoming filter sets default ids, or
+     * by other rest endpoints to make sure ids propagate to outgoing calls.
      *
      * @param sessionId The session id from the request headers.
      * @param requestId The request id from the request headers.
@@ -54,12 +68,15 @@ public class DemoApplication {
     }
 
     /**
-     * An endpoint that uses a RestTemplate to call our base URL to make sure the correlating id
-     * propagates to the Base URL.
+     * An endpoint that uses a RestTemplate to call our "ids" URL to make sure the correlating id
+     * propagates to the outgoing RestTemplate based requests.  It compares the correlating ids from
+     * the incoming request header with the ones returned from the "ids" endpoint to prove that the
+     * incoming ids were propagated when we made the outgoing request.
      *
      * @param sessionId The session id from the request headers.
      * @param requestId The request id from the request headers.
-     * @return OK if all is well.
+     * @return OK if all is well, INTERNAL SERVER ERROR, if the correlated ids of the outgoing
+     * request don't match the incoming request.
      */
     @RequestMapping(value = "/rest", method = RequestMethod.GET)
     public ResponseEntity<String> propagateRestTemplate(
@@ -67,7 +84,8 @@ public class DemoApplication {
             @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
         final String expectedResponse = sessionId + ":" + requestId;
-        String x = url("/ids");
+        // Call the "ids" endpoint to see if the incoming headers are automatically added to the
+        // RestTemplate based request.
         final String response = template.getForObject(url("/ids"), String.class);
         // If the response differs, it means the header didn't propagate and the incoming filter
         // assigned new ids.
@@ -78,12 +96,15 @@ public class DemoApplication {
     }
 
     /**
-     * An endpoint that uses a WebClient to call our base URL to make sure the correlating id
-     * propagates to the Base URL.
+     * An endpoint that uses a WebClient to call our "ids" URL to make sure the correlating id
+     * propagates to the outgoing WebClient based requests.  It compares the correlating ids from
+     * the incoming request header with the ones returned from the "ids" endpoint to prove that the
+     * incoming ids were propagated when we made the outgoing request.
      *
      * @param sessionId The session id from the request headers.
      * @param requestId The request id from the request headers.
-     * @return OK if all is well.
+     * @return OK if all is well, INTERNAL SERVER ERROR, if the correlated ids of the outgoing
+     * request don't match the incoming request.
      */
     @RequestMapping(value = "/webclient", method = RequestMethod.GET)
     public ResponseEntity<String> propagateWebClient(
@@ -91,6 +112,8 @@ public class DemoApplication {
             @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
         final String expectedResponse = sessionId + ":" + requestId;
+        // Call the "ids" endpoint to see if the incoming headers are automatically added to the
+        // WebClient based request.
         WebClient client = webClientBuilder
                 .baseUrl(url("/"))
                 .build();
@@ -107,19 +130,24 @@ public class DemoApplication {
 
 
     /**
-     * An endpoint that uses a Feign client to call our base URL to make sure the correlating id
-     * propagates to the Base URL.
+     * An endpoint that uses a Feign client to call our "ids" URL to make sure the correlating id
+     * propagates to the outgoing Feign based requests.  It compares the correlating ids from the
+     * incoming request header with the ones returned from the "ids" endpoint to prove that the
+     * incoming ids were propagated when we made the outgoing request.
      *
      * @param sessionId The session id from the request headers.
      * @param requestId The request id from the request headers.
-     * @return OK if all is well.
+     * @return OK if all is well, INTERNAL SERVER ERROR, if the correlated ids of the outgoing
+     * request don't match the incoming request.
      */
     @RequestMapping(value = "/feign", method = RequestMethod.GET)
-    public ResponseEntity propagateFeignClient(
+    public ResponseEntity<String> propagateFeignClient(
             @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
             @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
         final String expectedResponse = sessionId + ":" + requestId;
+        // Call the "ids" endpoint to see if the incoming headers are automatically added to the
+        // Feign based request.
         final String response = feignClient.getCorrelatingIds();
         // If the response differs, it means the header didn't propagate and the incoming filter
         // assigned new ids.
@@ -129,6 +157,11 @@ public class DemoApplication {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Helper method to set the URL for outgoing requests.
+     * @param path the path to add to the base URL of the application.
+     * @return a URL to use.
+     */
     private String url(String path) {
 
         return ServletUriComponentsBuilder.fromCurrentRequest().replacePath(path).toUriString();
