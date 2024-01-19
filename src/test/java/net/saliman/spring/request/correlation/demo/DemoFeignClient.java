@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Steven C. Saliman
  */
 @FeignClient(name="local", url = "localhost:10344")
-interface CorrelatedFeignClient {
+interface DemoFeignClient {
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    String getRequestId();
+    @RequestMapping(value = "/ids", method = RequestMethod.GET)
+    String getCorrelatingIds();
 }

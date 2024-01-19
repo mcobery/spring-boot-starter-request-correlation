@@ -18,6 +18,7 @@ package net.saliman.spring.request.correlation.api;
 import net.saliman.spring.request.correlation.http.ClientHttpCorrelationConfiguration;
 import net.saliman.spring.request.correlation.feign.FeignCorrelationConfiguration;
 import net.saliman.spring.request.correlation.support.RequestCorrelationConfiguration;
+import net.saliman.spring.request.correlation.webclient.WebClientCorrelationConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,6 +44,7 @@ import java.lang.annotation.*;
 @Import({
         RequestCorrelationConfiguration.class,
         ClientHttpCorrelationConfiguration.class,
+        WebClientCorrelationConfiguration.class,
         FeignCorrelationConfiguration.class
 })
 public @interface EnableRequestCorrelation {

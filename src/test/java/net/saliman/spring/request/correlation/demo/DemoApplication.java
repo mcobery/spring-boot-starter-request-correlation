@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
@@ -30,7 +31,10 @@ public class DemoApplication {
     private RestTemplate template;
 
     @Autowired
-    private CorrelatedFeignClient feignClient;
+    private DemoFeignClient feignClient;
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
 
 
     /**
@@ -41,7 +45,7 @@ public class DemoApplication {
      * @param requestId The request id from the request headers.
      * @return the session id and request id as a single string.
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/ids", method = RequestMethod.GET)
     public ResponseEntity<String> headerEcho(
             @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
             @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
@@ -58,19 +62,49 @@ public class DemoApplication {
      * @return OK if all is well.
      */
     @RequestMapping(value = "/rest", method = RequestMethod.GET)
-    public ResponseEntity propagateRestTemplate(
+    public ResponseEntity<String> propagateRestTemplate(
             @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
             @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
         final String expectedResponse = sessionId + ":" + requestId;
-        final String response = template.getForObject(url("/"), String.class);
+        String x = url("/ids");
+        final String response = template.getForObject(url("/ids"), String.class);
         // If the response differs, it means the header didn't propagate and the incoming filter
         // assigned new ids.
         if ( !expectedResponse.equals(response) ) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Correlation id mismatch!");
         }
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * An endpoint that uses a WebClient to call our base URL to make sure the correlating id
+     * propagates to the Base URL.
+     *
+     * @param sessionId The session id from the request headers.
+     * @param requestId The request id from the request headers.
+     * @return OK if all is well.
+     */
+    @RequestMapping(value = "/webclient", method = RequestMethod.GET)
+    public ResponseEntity<String> propagateWebClient(
+            @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
+            @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
+
+        final String expectedResponse = sessionId + ":" + requestId;
+        WebClient client = webClientBuilder
+                .baseUrl(url("/"))
+                .build();
+        String response = client.get().uri("/ids")
+                .retrieve().bodyToMono(String.class)
+                .block();
+        // If the response differs, it means the header didn't propagate and the incoming filter
+        // assigned new ids.
+        if ( !expectedResponse.equals(response) ) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Correlation id mismatch!");
+        }
+        return ResponseEntity.ok(response);
+    }
+
 
     /**
      * An endpoint that uses a Feign client to call our base URL to make sure the correlating id
@@ -86,11 +120,11 @@ public class DemoApplication {
             @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
 
         final String expectedResponse = sessionId + ":" + requestId;
-        final String response = feignClient.getRequestId();
+        final String response = feignClient.getCorrelatingIds();
         // If the response differs, it means the header didn't propagate and the incoming filter
         // assigned new ids.
         if ( !expectedResponse.equals(response) ) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Correlation id mismatch!");
         }
         return ResponseEntity.ok(response);
     }

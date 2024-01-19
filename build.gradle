@@ -12,11 +12,10 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.4.0'
 }
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: "jacoco"
 apply plugin: 'idea'
 
-apply from: 'libraries.gradle'
 apply from: 'license.gradle'
 apply from: 'release.gradle'
 
@@ -64,17 +63,23 @@ compileJava {
 }
 
 dependencies {
-    implementation (libraries.springBootWeb)
-    implementation (libraries.springCloudFeign)
-    implementation (libraries.feignHttpClient)
+    api "org.apache.commons:commons-lang3:${commonsLangVersion}"
 
-    implementation (libraries.commonsLang)
+    // For Spring RestTemplate
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 
-    annotationProcessor (libraries.springConfigurationProcessor)
+    // For Spring WebClient
+    implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
 
-    testImplementation (libraries.springBootTest)
-    testImplementation (libraries.junit)
-    testImplementation (libraries.mockito)
+    // For Feign
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${feignVersion}"
+    implementation "io.github.openfeign:feign-hc5:${feignHttpVersion}"
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    testImplementation "junit:junit:${junitVersion}"
+    testImplementation "org.mockito:mockito-all:${mockitoVersion}"
 
 }
 

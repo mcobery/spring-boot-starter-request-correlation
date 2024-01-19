@@ -3,6 +3,9 @@
 > A Spring Cloud starter for easy setup request correlation
 
 ## News
+**January 19, 2024** Version 3.0.0 now supports Spring Boot version 3, and adds support for 
+WebClients.
+
 **June 17, 2019**  Version 2.0.0 now supports Spring Boot version 2, and adds
 two new properties for controlling the position of the Request Correlation
 Filter so that this project can play nicely with the spring-session project.
@@ -41,26 +44,60 @@ the "save" request will have different request ids, but the same session id.
 
 Add the Spring Boot starter to your project:
 
-```xml
-<dependency>
-  <groupId>net.saliman</groupId>
-  <artifactId>spring-boot-starter-request-correlation</artifactId>
-  <version>2.0.0</version>
-</dependency>
+```groovy
+dependencies {
+  implementation "net.saliman:spring-boot-starter-request-correlation:3.0.0"
+}
+```
+
+This will make sure incoming requests have a correlating request id and session id.  To use these
+ids when making requests to collaborating services, add dependencies for the kind of calls you make:
+
+Feign:
+```groovy
+dependencies {
+  implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${feignVersion}"
+  implementation "io.github.openfeign:feign-hc5:${feignHttpVersion}"
+}
+
+```
+
+Spring WebClients:
+```groovy
+dependencies {
+  implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
+}
+```
+
+Spring RestTemplates:
+```groovy
+dependencies {
+  implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"  
+}
 ```
 
 ## Usage
 
 Annotate every Spring Boot / Cloud Application with `@EnableRequestCorrelation` 
-annotation. That's it.
+annotation, then make sure the Feign / WebClient.Builder / RestTemplate instances are Spring beans.
+That's it.
 
 ```java
 @EnableRequestCorrelation
 @SpringBootApplication
 public class Application {
-
+    @Autowired
+    private WebClient.builder webClientBuilder;
+    
+    @Autowired 
+    private RestTemplate restTemplate;
+    
+    @Autowired
+    private MyFeignClient feignClient;
 }
 ```
+
+You don't need all three beans in your services, only the ones you use in your application.
 
 ## Properties
 
@@ -106,10 +143,12 @@ session id through `RequestCorrelationUtils.getCurrentSessionId`
 
 ## Propagation
 
-Besides that you will also have transparent integration with fallowing:
+Besides that you will also have transparent integration with following:
 
 * RestTemplate - any Spring configured `RestTemplate` will be automatically
   populated with the request id.
+* WebClient - any Spring configured `WebClient.Builder` will automatically contain a filter that
+  populates WebClient requests with the request and session id.
 * Feign clients - similarly a request interceptor is being registered for Feign
   clients
 
@@ -118,7 +157,7 @@ Besides that you will also have transparent integration with fallowing:
 The extension itself simply gives you means to propagate the information. How 
 you going to use it is up to you.
 
-For instance you can apply this information to your logging MDC map. You can 
+For instance, you can apply this information to your logging MDC map. You can 
 achieve that by registering `RequestCorrelationInterceptor` bean. The 
 `RequestCorrelationInterceptor` gives you only an entry point so that
 any fallowing operation would be able to access the correlation identifier. You

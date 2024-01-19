@@ -54,7 +54,7 @@ public class RequestCorrelationIT {
     public void test() {
 
         // when
-        final String response = restTemplate.getForObject(url("/"), String.class);
+        final String response = restTemplate.getForObject(url("/ids"), String.class);
         assertNotNull(response);
         final String[] responseArr = response.split(":");
         assertEquals(2, responseArr.length);
@@ -84,6 +84,22 @@ public class RequestCorrelationIT {
 
     /**
      * Calls the rest endpoint with no headers to prove that we set headers when we get the call.
+     * The controller then calls the root endpoint, this time with headers to prove they cascade.
+     */
+    @Test
+    public void testWebClient() {
+
+        // when
+        final String response = restTemplate.getForObject(url("/webclient"), String.class);
+        assertNotNull(response);
+        final String[] responseArr = response.split(":");
+        assertEquals(2, responseArr.length);
+        assertNotNull(responseArr[0]);
+        assertNotNull(responseArr[1]);
+    }
+
+    /**
+     * Calls the rest endpoint with no headers to prove that we set headers when we get the call.
      * The controller then calls the feign client to prove that feign propagates the headers.
      */
     @Test
@@ -103,83 +119,4 @@ public class RequestCorrelationIT {
         return String.format("http://127.0.0.1:%d/%s", port, path);
     }
 
-//    @FeignClient(name="local", url = "localhost:10344")
-//    interface CorrelatedFeignClient {
-//
-//        @RequestMapping(value = "/", method = RequestMethod.GET)
-//        String getRequestId();
-//    }
-
-//    @RestController
-//    @EnableAutoConfiguration
-//    @EnableRequestCorrelation
-//    @EnableFeignClients
-////    @RibbonClient(name = "local", configuration = LocalRibbonClientConfiguration.class)
-//    public static class Application {
-//
-//        @Autowired
-//        private RestTemplate template;
-//
-//        @Autowired
-//        private CorrelatedFeignClient feignClient;
-//
-//        @Bean
-//        public RestTemplate restTemplate() {
-//            return new RestTemplate();
-//        }
-//
-//        @RequestMapping(value = "/", method = RequestMethod.GET)
-//        public ResponseEntity<String> headerEcho(
-//                @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
-//                @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
-//
-//            return ResponseEntity.ok(sessionId + ":" + requestId);
-//        }
-//
-//        @RequestMapping(value = "/rest", method = RequestMethod.GET)
-//        public ResponseEntity propagateRestTemplate(
-//                @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
-//                @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
-//
-//            final String expectedResponse = sessionId + ":" + requestId;
-//            RestTemplate t = restTemplate();
-//            final String response = template.getForObject(url("/"), String.class);
-//            if(!expectedResponse.equals(response)) {
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//            }
-//            return ResponseEntity.ok(response);
-//        }
-//
-//        @RequestMapping(value = "/feign", method = RequestMethod.GET)
-//        public ResponseEntity propagateFeignClient(
-//                @RequestHeader(value = RequestCorrelationConsts.SESSION_HEADER_NAME) String sessionId,
-//                @RequestHeader(value = RequestCorrelationConsts.REQUEST_HEADER_NAME) String requestId) {
-//
-//            final String expectedResponse = sessionId + ":" + requestId;
-//            final String response = feignClient.getRequestId();
-//            if(!expectedResponse.equals(response)) {
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//            }
-//            return ResponseEntity.ok(response);
-//        }
-//
-//        private String url(String path) {
-//
-//            return ServletUriComponentsBuilder.fromCurrentRequest().replacePath(path).toUriString();
-//        }
-//    }
-
-//    @Configuration
-//    static class LocalRibbonClientConfiguration {
-//
-//        @Value("${local.server.port}")
-//        private int port = 0;
-//
-//        @Bean
-//        public ILoadBalancer ribbonLoadBalancer() {
-//            BaseLoadBalancer balancer = new BaseLoadBalancer();
-//            balancer.setServersList(Collections.singletonList(new Server("localhost", this.port)));
-//            return balancer;
-//        }
-//    }
 }
