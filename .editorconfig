@@ -17,13 +17,13 @@ root = true
 [*]
 charset = utf-8
 end_of_line = lf
-indent_size = 4
+indent_size = 2
 indent_style = space
 insert_final_newline = true
 max_line_length = 100
-tab_width = 4
+tab_width = 2
 trim_trailing_whitespace = true
-ij_continuation_indent_size = 8
+ij_continuation_indent_size = 4
 # Allow formatting to be turned off for certain code blocks.  This is most
 # useful when chaining methods with the Spring Security DSL to make sense of
 # what it is doing.

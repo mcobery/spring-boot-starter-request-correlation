@@ -1,0 +1,55 @@
+apply plugin: 'com.diffplug.spotless'
+
+project.afterEvaluate {
+/**
+ * Custom Rules for Spotless
+ */
+def customStarImportRule = { str -> {
+  def STAR_IMPORT = /import\s.+\.\*\;/
+  def matcher = str =~ STAR_IMPORT
+
+  if (matcher.size() > 0) {
+    def results = []
+    matcher.eachWithIndex{ match, idx -> results.add(match) }
+    throw new AssertionError(results)
+  }
+}}
+
+def customStarImport = [
+  name: 'Avoid * Import',
+  rule: { str -> {
+    def STAR_IMPORT = /import\s.+\.\*\;/
+    def matcher = str =~ STAR_IMPORT
+
+    if (matcher.size() > 0) {
+      def results = []
+      matcher.eachWithIndex{ match, idx -> results.add(match) }
+      throw new AssertionError(results)
+    }
+  }}
+]
+
+/**
+ * Spotless Configuration
+ */
+spotless {
+  enforceCheck true
+  java {
+    // Removes unused imports
+    removeUnusedImports()
+
+    // Adjusts import order
+    importOrder('\\#', 'com.chewy', '', 'jakarta|java')
+
+    // Uses Google's code formatting defaults
+    googleJavaFormat("${project.ext.versions.google.format}")
+      .reflowLongStrings()
+
+    // Format Annotations
+    formatAnnotations()
+
+    // Avoid Star Import
+    custom customStarImport.name, customStarImport.rule
+  }
+}
+}

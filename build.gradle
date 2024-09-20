@@ -1,15 +1,25 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-    }
+plugins {
+  id "com.github.hierynomus.license" version "0.16.1"
+  id 'com.github.kt3k.coveralls' version '2.12.2'
+  id "com.diffplug.spotless" version "6.21.0"
 }
 
-plugins {
-    id "com.github.hierynomus.license" version "0.11.0"
-    id 'com.github.kt3k.coveralls' version '2.4.0'
+ext {
+  versions = [
+      'assertj'           : '3.24.2',
+      'commons'           : [
+          'lang3': '3.14.0'
+      ],
+      'feign'             : '12.4',
+      'google'              : [
+          'format'            : '1.19.1'
+      ],      'junit'             : '4.13.2',
+      'mockito'           : '5.13.0',
+      'spring'            : [
+          'boot'          : '3.1.5',
+          'feign'         : '4.0.4'
+      ],
+  ]
 }
 
 apply plugin: 'java-library'
@@ -23,35 +33,23 @@ apply plugin: 'pmd'
 
 apply plugin: 'com.github.kt3k.coveralls'
 
-sourceCompatibility = 17
+
+apply from: "${rootProject.projectDir}/gradle/spotless.gradle"
 
 // Release version that won't conflict with the bintray plugin
-group = "net.saliman"
+group = 'net.cobery'
+version = '1.0.0'
 archivesBaseName = "spring-boot-starter-request-correlation"
 
-// Java 17 started getting a lot pickier about opening classes to other classes.  Tests will need
-// some "opens" to work properly.
-tasks.withType(Test).configureEach{
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.lang=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.lang.invoke=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.util=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.net=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.nio.charset=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.time=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.base/java.util.stream=ALL-UNNAMED']
-    jvmArgs = jvmArgs + ['--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED']
-}
-
 jar {
-    manifest {
-        attributes 'Implementation-Title': 'spring-boot-starter-request-correlation',
-                   'Implementation-Version': version
-    }
+  manifest {
+    attributes 'Implementation-Title': 'spring-boot-starter-request-correlation',
+        'Implementation-Version': version
+  }
 }
 
 repositories {
-    jcenter()
+  jcenter()
 }
 
 configurations {
@@ -59,28 +57,43 @@ configurations {
 }
 
 compileJava {
-    options.fork = true
+  options.fork = true
 }
 
 dependencies {
-    api "org.apache.commons:commons-lang3:${commonsLangVersion}"
+  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${versions.spring.boot}"
 
-    // For Spring RestTemplate
-    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+  api "org.apache.commons:commons-lang3:${versions.commons.lang3}"
 
-    // For Spring WebClient
-    implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
+  // For Spring RestTemplate
+  implementation "org.springframework.boot:spring-boot-starter-web:${versions.spring.boot}"
+  // For Spring WebClient
+  implementation "org.springframework.boot:spring-boot-starter-webflux:${versions.spring.boot}"
 
-    // For Feign
-    implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${feignVersion}"
-    implementation "io.github.openfeign:feign-hc5:${feignHttpVersion}"
+  // For Feign
+  implementation "io.github.openfeign:feign-hc5:${versions.feign}"
+  implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${versions.spring.feign}"
 
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-
-    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
-    testImplementation "junit:junit:${junitVersion}"
-    testImplementation "org.mockito:mockito-all:${mockitoVersion}"
+  testImplementation "org.assertj:assertj-core:${versions.assertj}"
+  testImplementation "org.mockito:mockito-core:${versions.mockito}"
+  testImplementation "org.mockito:mockito-junit-jupiter:${versions.mockito}"
+  testImplementation "org.springframework.boot:spring-boot-starter-test:${versions.spring.boot}"
 
 }
 
+test {
+  useJUnitPlatform {
+    includeEngines 'junit-jupiter'
+  }
+
+  testLogging {
+    events "skipped", "failed"
+    exceptionFormat "full"
+    afterSuite { desc, result ->
+      if (!desc.parent) { // will match the outermost suite
+        println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+      }
+    }
+  }
+}
 

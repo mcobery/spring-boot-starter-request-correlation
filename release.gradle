@@ -31,7 +31,7 @@ publishing {
             pom {
                 name = 'spring-boot-starter-request-correlation'
                 description = 'A Spring Boot starter that can set correlation ids on outgoing requests.'
-                url = 'https://github.com/stevesaliman/spring-boot-starter-request-correlation'
+                url = 'https://github.com/mcobery/spring-boot-starter-request-correlation'
                 packaging = 'jar'
                 licenses {
                     license {
@@ -40,6 +40,11 @@ publishing {
                     }
                 }
                 developers {
+                    developer {
+                        id = 'mcobery'
+                        name = 'Marc Cobery'
+                        email = 'cobery@cobery.net'
+                    }
                     developer {
                         id = 'stevesaliman'
                         name = 'Steven C. Saliman'
@@ -52,9 +57,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:https://stevesaliman@github.com/stevesaliman/spring-boot-starter-request-correlation'
-                    developerConnection = 'scm:git@github.com:stevesaliman/spring-boot-starter-request-correlation.git'
-                    url = 'https://github.com/stevesaliman/spring-boot-starter-request-correlation'
+                    connection = 'scm:https://mcobery@github.com/mcobery/spring-boot-starter-request-correlation'
+                    developerConnection = 'scm:git@github.com:mcobery/spring-boot-starter-request-correlation.git'
+                    url = 'https://github.com/mcobery/spring-boot-starter-request-correlation'
                 }
             }
 
