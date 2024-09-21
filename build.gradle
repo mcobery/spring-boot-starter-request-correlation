@@ -87,7 +87,7 @@ test {
   }
 
   testLogging {
-    events "skipped", "failed"
+    events "passed", "skipped", "failed"
     exceptionFormat "full"
     afterSuite { desc, result ->
       if (!desc.parent) { // will match the outermost suite
@@ -96,4 +96,5 @@ test {
     }
   }
 }
+
 
