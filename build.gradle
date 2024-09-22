@@ -3,6 +3,7 @@ plugins {
   id 'com.github.kt3k.coveralls' version '2.12.2'
   id "com.diffplug.spotless" version "6.21.0"
   id 'maven-publish'
+  id 'nebula.release' version '19.0.10'
 }
 
 ext {
