@@ -20,6 +20,6 @@ jobs:
         check-latest: true
         cache: 'gradle'
     - name: Run Gradle build
-      run: ./gradlew build --no-daemon
+      run: ./gradlew assemble --no-daemon
     - name: Run tests
       run: ./gradlew check
