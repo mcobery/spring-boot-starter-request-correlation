@@ -2,6 +2,7 @@ plugins {
   id "com.github.hierynomus.license" version "0.16.1"
   id 'com.github.kt3k.coveralls' version '2.12.2'
   id "com.diffplug.spotless" version "6.21.0"
+  id 'maven-publish'
 }
 
 ext {
@@ -33,12 +34,11 @@ apply plugin: 'pmd'
 
 apply plugin: 'com.github.kt3k.coveralls'
 
-
 apply from: "${rootProject.projectDir}/gradle/spotless.gradle"
 
 // Release version that won't conflict with the bintray plugin
-group = 'net.cobery'
-version = '1.0.0'
+group = 'com.tipsymcstagger'
+version = '4.0.0-SNAPSHOT'
 archivesBaseName = "spring-boot-starter-request-correlation"
 
 jar {
@@ -49,7 +49,7 @@ jar {
 }
 
 repositories {
-  jcenter()
+  mavenCentral()
 }
 
 configurations {
@@ -97,4 +97,52 @@ test {
   }
 }
 
+//publishing {
+//  if(project.hasProperty('nexusUsername')) {
+//    repositories {
+//      maven {
+//        name = "ossrh"
+//        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+//        credentials {
+//          username = project.nexusUsername
+//          password = project.nexusPassword
+//        }
+//      }
+//    }
+//  }
+//
+//  publications {
+//    mavenJava {
+//      artifact sourcesJar
+//      artifact javadocJar
+//      artifact testsJar
+//
+//      versionMapping {
+//        usage('java-api') {
+//          fromResolutionOf('runtimeClasspath')
+//        }
+//        usage('java-runtime') {
+//          fromResolutionResult()
+//        }
+//      }
+//    }
+//  }
+//}
 
+
+
+publishing {
+
+  repositories {
+    maven {
+      name = "OSSRH"
+      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      credentials {
+        username = System.getenv("MAVEN_USERNAME")
+        password = System.getenv("MAVEN_PASSWORD")
+      }
+    }
+  }
+
+
+}
