@@ -29,7 +29,7 @@ apply plugin: "jacoco"
 apply plugin: 'idea'
 
 apply from: 'license.gradle'
-apply from: 'release.gradle'
+//apply from: 'release.gradle'
 
 apply plugin: 'pmd'
 
@@ -39,7 +39,6 @@ apply from: "${rootProject.projectDir}/gradle/spotless.gradle"
 
 // Release version that won't conflict with the bintray plugin
 group = 'com.tipsymcstagger'
-version = '4.0.0-SNAPSHOT'
 archivesBaseName = "spring-boot-starter-request-correlation"
 
 jar {
