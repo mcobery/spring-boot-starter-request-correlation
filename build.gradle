@@ -3,6 +3,7 @@ plugins {
   id 'com.github.kt3k.coveralls' version '2.12.2'
   id "com.diffplug.spotless" version "6.21.0"
   id 'maven-publish'
+  id 'nebula.release' version '19.0.10'
 }
 
 ext {
@@ -28,7 +29,7 @@ apply plugin: "jacoco"
 apply plugin: 'idea'
 
 apply from: 'license.gradle'
-apply from: 'release.gradle'
+//apply from: 'release.gradle'
 
 apply plugin: 'pmd'
 
@@ -38,7 +39,6 @@ apply from: "${rootProject.projectDir}/gradle/spotless.gradle"
 
 // Release version that won't conflict with the bintray plugin
 group = 'com.tipsymcstagger'
-version = '4.0.0-SNAPSHOT'
 archivesBaseName = "spring-boot-starter-request-correlation"
 
 jar {

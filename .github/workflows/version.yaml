@@ -1,0 +1,20 @@
+name: Spring Boot Starter for Correlation ID
+on:
+  push:
+    branches:
+      - master
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+        check-latest: true
+        cache: 'gradle'
+    - name: Run tests
+      run: ./gradlew final

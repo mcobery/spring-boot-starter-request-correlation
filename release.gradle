@@ -43,7 +43,7 @@ publishing {
                     developer {
                         id = 'mcobery'
                         name = 'Marc Cobery'
-                        email = 'cobery@cobery.net'
+                        email = 'marc@tipsymcstagger.com'
                     }
                     developer {
                         id = 'stevesaliman'
