@@ -2,8 +2,10 @@ plugins {
   id "com.github.hierynomus.license" version "0.16.1"
   id 'com.github.kt3k.coveralls' version '2.12.2'
   id "com.diffplug.spotless" version "6.21.0"
+  id 'java-library'
   id 'maven-publish'
   id 'nebula.release' version '19.0.10'
+  id 'signing'
 }
 
 ext {
@@ -41,12 +43,6 @@ apply from: "${rootProject.projectDir}/gradle/spotless.gradle"
 group = 'com.tipsymcstagger'
 archivesBaseName = "spring-boot-starter-request-correlation"
 
-jar {
-  manifest {
-    attributes 'Implementation-Title': 'spring-boot-starter-request-correlation',
-        'Implementation-Version': version
-  }
-}
 
 repositories {
   mavenCentral()
@@ -97,52 +93,98 @@ test {
   }
 }
 
-//publishing {
-//  if(project.hasProperty('nexusUsername')) {
-//    repositories {
-//      maven {
-//        name = "ossrh"
-//        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-//        credentials {
-//          username = project.nexusUsername
-//          password = project.nexusPassword
-//        }
-//      }
-//    }
-//  }
-//
-//  publications {
-//    mavenJava {
-//      artifact sourcesJar
-//      artifact javadocJar
-//      artifact testsJar
-//
-//      versionMapping {
-//        usage('java-api') {
-//          fromResolutionOf('runtimeClasspath')
-//        }
-//        usage('java-runtime') {
-//          fromResolutionResult()
-//        }
-//      }
-//    }
-//  }
-//}
+tasks.register('createProperties') {
+  doLast {
+    new File("$projectDir/src/main/resources/version.properties").withWriter { w ->
+      Properties p = new Properties()
+      p['version'] = project.version.toString()
+      p.store w, null
+    }
+  }
+}
 
+classes {
+  dependsOn createProperties
+}
 
+jar {
+  manifest {
+    attributes(
+        "Implementation-Title": project.name,
+        "Implementation-Version": version,
+        "Implementation-Vendor": "Marc Cobery",
+        "Build-Jdk": org.gradle.internal.jvm.Jvm.current(),
+        "Gradle-Version": GradleVersion.current().toString()
+    )
+  }
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+ext.admin = System.getenv("MAVEN_USERNAME")
+
+signing {
+  required { admin }
+  def signingKey = System.getenv("GPG_SIGNING_KEY")
+  def signingPassword = System.getenv("GPG_SIGNING_PASSPHRASE")
+  useInMemoryPgpKeys(signingKey, signingPassword)
+  sign publishing.publications
+}
+
+//
+// MAVEN
+//
 
 publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
 
-  repositories {
-    maven {
-      name = "OSSRH"
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      credentials {
-        username = System.getenv("MAVEN_USERNAME")
-        password = System.getenv("MAVEN_PASSWORD")
+      pom {
+        name = 'spring-boot-starter-request-correlation'
+        description = rootProject.description
+        url = 'https://github.com/mcobery/spring-boot-starter-request-correlation'
+        licenses {
+          license {
+            name = 'Apache License'
+            url = 'https://github.com/mcobery/spring-boot-starter-request-correlation/blob/master/LICENSE'
+            distribution = 'repo'
+          }
+        }
+        developers {
+          developer {
+            id = 'mcobery'
+            name = 'Marc Cobery'
+            email = 'marc@tipsymcstagger.com'
+          }
+        }
+        scm {
+          connection = 'scm:git:git@github.com:mcobery/spring-boot-starter-request-correlation.git'
+          developerConnection = 'scm:git@github.com:mcobery/spring-boot-starter-request-correlation.git'
+          url = 'https://github.com/mcobery/spring-boot-starter-request-correlation'
+        }
       }
     }
   }
-
-
+  repositories {
+    maven {
+      name = "OSSRH"
+      if (admin) {
+        credentials {
+          username = System.getenv("MAVEN_USERNAME")
+          password = System.getenv("MAVEN_PASSWORD")
+        }
+      }
+      def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+      def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+      url = version.toString().toUpperCase().contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+    }
+  }
 }
