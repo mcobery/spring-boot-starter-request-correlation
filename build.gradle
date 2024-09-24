@@ -144,5 +144,5 @@ publishing {
     }
   }
 
-
+  tasks.release.dependsOn build
 }
