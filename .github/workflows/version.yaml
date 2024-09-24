@@ -21,4 +21,4 @@ jobs:
         check-latest: true
         cache: 'gradle'
     - name: Run tests
-      run: ./gradlew final
+      run: ./gradlew -Prelease.useLastTag=true final
