@@ -123,6 +123,10 @@ jar {
   }
 }
 
+nebulaRelease {
+  addReleaseBranchPattern('master')
+}
+
 java {
   withJavadocJar()
   withSourcesJar()
