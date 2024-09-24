@@ -187,4 +187,5 @@ publishing {
       url = version.toString().toUpperCase().contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
     }
   }
+  tasks.release.dependsOn build
 }
