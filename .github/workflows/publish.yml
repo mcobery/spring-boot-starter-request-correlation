@@ -1,0 +1,26 @@
+name: Publish package to the Maven Central Repository and GitHub Packages
+on:
+  release:
+    types: [published]
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          check-latest: true
+          cache: 'gradle'
+      - name: Run tests
+        run: ./gradlew publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
